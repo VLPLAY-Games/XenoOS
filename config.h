@@ -7,3 +7,4 @@ const char* commands[] = {
 };
 const char* os_github = "github.com/VLPLAY-Games/XenoOS";
 bool system_started = false;
+const char* sys_upd_url = "https://raw.githubusercontent.com/VLPLAY-Games/Updates/main/XenoOS/update.bin";

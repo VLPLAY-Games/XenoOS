@@ -326,7 +326,7 @@ class SystemUpdate {
     Esp &esp;                   // Ссылка на объект Esp для обновлений
     Help help;                  // Объект для справки
     const char* update_commands[3] = {"download", "install", "help"}; // Список доступных команд для обновлений
-    const char* url = "https://raw.githubusercontent.com/VLPLAY-Games/Updates/main/XenoOS/update.bin";
+    
 
   public:
     // Конструктор
@@ -349,7 +349,7 @@ class SystemUpdate {
 
       // Команда загрузки обновления
       if (command[2] == "download") {
-        wget.handle_wget_commands({"wget", url, "/upd"});
+        wget.handle_wget_commands({"wget", sys_upd_url, "/upd"});
       } 
       // Команда установки обновления
       else if (command[2] == "install") {
