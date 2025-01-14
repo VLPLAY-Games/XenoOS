@@ -386,26 +386,50 @@ class Esp {
 
     // perform the actual update from a given stream
     void performUpdate(Stream &updateSource, size_t updateSize) {
+      Timer updateTimer;  // Создаем экземпляр таймера для отслеживания времени обновления
+
       if (Update.begin(updateSize)) {
-        size_t written = Update.writeStream(updateSource);
-        if (written == updateSize) {
-          Serial.println("Written : " + String(written) + " successfully");
-        } else {
-          Serial.println("Written only : " + String(written) + "/" + String(updateSize) + ". Retry?");
+        size_t written = 0;
+        uint8_t buffer[128];  // Буфер для записи данных
+        int progress = 0;
+        size_t totalWritten = 0;
+
+        // Чтение и запись данных
+        while (updateSource.available()) {
+          int len = updateSource.readBytes(buffer, sizeof(buffer));
+          written = Update.write(buffer, len);
+          totalWritten += written;
+
+          // Печать прогресса
+          int currentProgress = (totalWritten * 100) / updateSize;  // Вычисляем прогресс в процентах
+          if (currentProgress > progress) {
+            progress = currentProgress;
+            Serial.printf("Writing at 0x%08x... (%d%%)\n", totalWritten, progress);
+          }
         }
+
+        // Окончание записи
+        float elapsedTime = updateTimer.get_sec();  // Время выполнения обновления в секундах
+        float speed = (totalWritten / 1024.0) / elapsedTime;  // Скорость в KB/s
+
+        // Финальный отчет
+        Serial.printf("Wrote %d bytes at 0x%08x in %.1f seconds (effective %.1f kbit/s)...\n", totalWritten, 0x10000, elapsedTime, speed * 8); // Выводим информацию о размере и скорости
+
         if (Update.end()) {
-          Serial.println("OTA done!");
+          Serial.println("Update done!");
           if (Update.isFinished()) {
-            Serial.println("Update successfully completed. Rebooting.");
+            Serial.println("Updating successful");
+            Serial.println("Rebooting...");
+            ESP.restart();  // Перезагружаем устройство после успешного обновления
           } else {
-            Serial.println("Update not finished? Something went wrong!");
+            Serial.println("Update not finished. Something went wrong.");
           }
         } else {
           Serial.println("Error Occurred. Error #: " + String(Update.getError()));
         }
 
       } else {
-        Serial.println("Not enough space to begin OTA");
+        Serial.println("Not enough space to begin Update");
       }
     }
 
@@ -422,7 +446,7 @@ class Esp {
         size_t updateSize = updateBin.size();
 
         if (updateSize > 0) {
-          Serial.println("Try to start update");
+          Serial.println("Trying to start update");
           performUpdate(updateBin, updateSize);
         } else {
           Serial.println("Error, file is empty");
@@ -433,7 +457,7 @@ class Esp {
         // when finished remove the binary from sd card to indicate end of the process
         fs.remove("/upd/update.bin");
       } else {
-        Serial.println("Could not load update.bin from sd root");
+        Serial.println("Could not load update.bin from /upd/");
       }
     }
 };

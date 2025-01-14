@@ -1,7 +1,7 @@
 const char* os_name = "XenoOS";
-const char* os_version = "0.1.0";
+const char* os_version = "0.1.1";
 const char* made_by = "Made by VL_PLAY Games";
-const char* os_date = "13.01.2025";
+const char* os_date = "14.01.2025";
 const char* commands[] = {
   "wget", "mkdir", "ls", "cd", "rm", "wifi", "free", "sdcard", "clear", "system", "help", "cpu", "cat", "rename"
 };
