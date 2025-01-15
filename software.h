@@ -63,13 +63,15 @@ class System {
         } else if (!command.empty() && command[0] == "wget") {
           Wget wget(wifi, sd);
           wget.handle_wget_commands(command);
-        } 
-        else if (!command.empty() && command[0] == "cat") {
+        } else if (!command.empty() && command[0] == "cat") {
           Cat cat(sd);
           cat.handle_cat_commands(command);
         } else if (!command.empty() && command[0] == "rename") {
           Rename rename(sd);
           rename.handle_rename_commands(command);
+        } else if (!command.empty() && command[0] == "mac") {
+          Mac mac;
+          mac.handle_mac_commands(command, esp);
         } else if (sc.get_input() == "free") funcs.free(esp);
         else if (sc.get_input() == "update") funcs.update();
         else if (sc.get_input() == "clear") funcs.clear();

@@ -34,12 +34,31 @@ class Bootloader{
       timer.print_time();
       Serial.println("Initializing bootloader");
       timer.print_time();
+      Serial.println("");
+      timer.print_time();
+      Serial.println("CPU0 reset reason:");
+      timer.print_time();
+      esp.print_reset_reason(rtc_get_reset_reason(0));
+      timer.print_time();
+      esp.verbose_print_reset_reason(rtc_get_reset_reason(0));
+      timer.print_time();
+      Serial.println("CPU1 reset reason:");
+      timer.print_time();
+      esp.print_reset_reason(rtc_get_reset_reason(1));
+      timer.print_time();
+      esp.verbose_print_reset_reason(rtc_get_reset_reason(1));
+      timer.print_time();
+      Serial.println("");
+      timer.print_time();
       Serial.println("Initialize bootloader successful");
     }
 
     void boot(){
       timer.print_time();
       Serial.println("Initializing hardware");
+
+      timer.print_time();
+      Serial.println("");
 
       timer.print_time();
       Serial.print("Chip model ");
@@ -73,18 +92,32 @@ class Bootloader{
       Serial.println(" KB");
       
       timer.print_time();
+      Serial.println("");
+
+      timer.print_time();
       Serial.println("Initialize hardware successful");
       timer.print_time();
       Serial.println("Initializing system");
+      timer.print_time();
+      Serial.println("");
       timer.print_time();
       Serial.print(os_name);
       Serial.print(" version: ");
       Serial.println(os_version);
       timer.print_time();
+      Serial.print("OS Date ");
+      Serial.println(os_date);
+      timer.print_time();
+      Serial.println("");
+      timer.print_time();
       Serial.println("Loading modules");
       timer.print_time();
       Serial.println("Loading SD Card");
+      timer.print_time();
+      Serial.println("");
       sd.init(timer);
+      timer.print_time();
+      Serial.println("");
       if (card_init){
         boot_success = true;
       }
