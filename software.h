@@ -72,6 +72,15 @@ class System {
         } else if (!command.empty() && command[0] == "mac") {
           Mac mac;
           mac.handle_mac_commands(command, esp);
+        } else if (!command.empty() && command[0] == "touch") {
+          Touch touch;
+          touch.handle_touch_commands(command, sd);
+        } else if (!command.empty() && command[0] == "mv") {
+          Mv mv;
+          mv.handle_mv_commands(command, sd);
+        } else if (!command.empty() && command[0] == "cp") {
+          Cp cp;
+          cp.handle_cp_commands(command, sd);
         } else if (sc.get_input() == "free") funcs.free(esp);
         else if (sc.get_input() == "update") funcs.update();
         else if (sc.get_input() == "clear") funcs.clear();

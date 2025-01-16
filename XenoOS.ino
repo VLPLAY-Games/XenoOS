@@ -1,4 +1,4 @@
-#include "defines.h"
+
 #include "config.h"
 #include "timer.h"
 #include "main_funcs/help.h"
@@ -8,7 +8,8 @@
 #include "modules.h"
 #include "main_funcs/main_funcs.h"
 #include "software.h"
-#include "bootloader.h"
+#include "boot/recovery.h"
+#include "boot/bootloader.h"
 
 
 Timer timer;

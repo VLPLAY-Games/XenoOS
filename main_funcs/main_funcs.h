@@ -10,6 +10,9 @@
 #include "wget.h"
 #include "sys_update.h"
 #include "mac.h"
+#include "touch.h"
+#include "mv.h"
+#include "cp.h"
 
 
 class MainFuncs{

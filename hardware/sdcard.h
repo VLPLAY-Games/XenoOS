@@ -269,4 +269,142 @@ class SdCard{
       }
       return false;
     }
+
+    // Новая функция: Изменение текущего каталога
+    void change_directory(const String& path) {
+      String resolved_path = resolve_path(path);
+      if (is_directory(resolved_path)) {
+        current_directory = resolved_path;
+        Serial.print("Current directory changed to: ");
+        Serial.println(current_directory);
+      } else {
+        Serial.print("Failed to change directory: Directory doesn't exists ");
+        Serial.println(resolved_path);
+      }
+    }
+
+    // Новая функция: Перемещение файла
+    void move_file(const char* source_path, const char* destination_path) {
+      Serial.printf("Moving file from %s to %s\n", source_path, destination_path);
+
+      // Проверяем, существует ли исходный файл
+      if (!SD.exists(source_path)) {
+        Serial.println("Source file does not exist");
+        return;
+      }
+
+      // Копируем файл в новую директорию
+      copy_file(source_path, destination_path);
+
+      // Удаляем исходный файл после успешного копирования
+      if (SD.remove(source_path)) {
+        Serial.println("File moved successfully");
+      } else {
+        Serial.println("Failed to remove source file after copying");
+      }
+    }
+
+    // Новая функция: Копирование файла
+    void copy_file(const char* source_path, const char* destination_path) {
+      File source = SD.open(source_path, FILE_READ);
+      if (!source) {
+        Serial.println("Failed to open source file for copying");
+        return;
+      }
+
+      File destination = SD.open(destination_path, FILE_WRITE);
+      if (!destination) {
+        Serial.println("Failed to open destination file for copying");
+        source.close();
+        return;
+      }
+
+      while (source.available()) {
+        destination.write(source.read());
+      }
+
+      Serial.printf("File copied from %s to %s\n", source_path, destination_path);
+      source.close();
+      destination.close();
+    }
+
+    // Новая функция: Подсчет файлов в директории
+    size_t count_files(const char* directory_path) {
+      size_t file_count = 0;
+      File dir = SD.open(directory_path);
+      if (!dir || !dir.isDirectory()) {
+        Serial.println("Invalid directory for counting files");
+        return 0;
+      }
+
+      File file = dir.openNextFile();
+      while (file) {
+        if (!file.isDirectory()) {
+          file_count++;
+        }
+        file = dir.openNextFile();
+      }
+      return file_count;
+    }
+
+    // Новая функция: Чтение строки из файла
+    String read_line(File& file) {
+      String line = "";
+      while (file.available()) {
+        char c = file.read();
+        if (c == '\n') break;
+        line += c;
+      }
+      return line;
+    }
+
+    // Новая функция: Поиск файла
+    bool find_file(const char* directory_path, const char* filename) {
+      File dir = SD.open(directory_path);
+      if (!dir || !dir.isDirectory()) {
+        Serial.println("Invalid directory for searching file");
+        return false;
+      }
+
+      File file = dir.openNextFile();
+      while (file) {
+        if (!file.isDirectory() && strcmp(file.name(), filename) == 0) {
+          return true;
+        }
+        file = dir.openNextFile();
+      }
+      return false;
+    }
+    
+    // Новая функция: Получение размера файла
+    size_t get_file_size(const char* file_path) {
+      File file = SD.open(file_path);
+      if (!file) {
+        Serial.println("Failed to open file for getting size");
+        return 0;
+      }
+      size_t size = file.size();
+      file.close();
+      return size;
+    }
+
+    void create_empty_file(const char* path) {
+      Serial.printf("Creating empty file: %s\n", path);
+
+      // Проверяем, существует ли файл
+      if (SD.exists(path)) {
+        Serial.println("File already exists");
+        return;
+      }
+
+      // Открываем файл в режиме записи, создавая его
+      File file = SD.open(path, FILE_WRITE);
+      if (!file) {
+        Serial.println("Failed to create file");
+        return;
+      }
+
+      Serial.println("Empty file created successfully");
+      file.close();
+    }
 };

@@ -6,16 +6,10 @@ class Cd {
         return;
       }
 
-      String new_path = sd.normalize_path(command[1]);
-      new_path = sd.resolve_path(new_path);
+      // Используем функцию change_directory из SdCard
+      sd.change_directory(command[1]);
 
-      if (SD.exists(new_path)) {
-        current_directory = new_path;
-        Serial.println("Directory changed to: " + current_directory);
-      } else {
-        Serial.println("Directory does not exist: " + new_path);
-      }
-
+      // Вывод текущего каталога
       Serial.println("Current directory: " + current_directory);
     }
 };
