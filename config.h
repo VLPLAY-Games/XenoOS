@@ -1,10 +1,11 @@
 const char* os_name = "XenoOS";
-const char* os_version = "0.1.3";
+const char* os_version = "0.1.4";
 const char* made_by = "Made by VL_PLAY Games";
-const char* os_date = "16.01.2025";
+const char* os_date = "17.01.2025";
 const char* commands[] = {
-  "wget", "mkdir", "ls", "cd", "rm", "wifi", "free", "sdcard", "clear", "system", "help", "cpu", "cat", "rename", "mac", "touch", "mv", "cp"
+  "wget", "mkdir", "ls", "cd", "rm", "wifi", "free", "sdcard", "clear", "system", "help", "cpu", "cat", "rename", "mac", "touch", "mv", "cp", "history"
 };
 const char* os_github = "github.com/VLPLAY-Games/XenoOS";
 bool system_started = false;
 const char* sys_upd_url = "https://raw.githubusercontent.com/VLPLAY-Games/Updates/main/XenoOS/update.bin";
+const char* historylog_path = "/sys/history.log";

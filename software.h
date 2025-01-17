@@ -3,6 +3,7 @@ class System {
     MainFuncs funcs;
     SerialConnection sc;
     Help help;
+    History history;
     const char* system_commands[4] = {"restart", "info", "update", "help"}; // Массив строк с командами
 
 
@@ -81,11 +82,15 @@ class System {
         } else if (!command.empty() && command[0] == "cp") {
           Cp cp;
           cp.handle_cp_commands(command, sd);
+        } else if (!command.empty() && command[0] == "history") {
+          history.handle_history_commands(command, sd);
         } else if (sc.get_input() == "free") funcs.free(esp);
         else if (sc.get_input() == "update") funcs.update();
         else if (sc.get_input() == "clear") funcs.clear();
         else if (sc.get_input() == "help") funcs.help_commands();
         else Serial.println("Unknown command");
+        
+        history.write_history((sc.get_input() + "\n").c_str(), sd);
 
         sc.empty_command();
         sc.empty_input();

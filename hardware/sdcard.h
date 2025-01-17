@@ -79,7 +79,8 @@ class SdCard{
           Serial.print("  FILE: ");
           Serial.print(file.name());
           Serial.print("  SIZE: ");
-          Serial.println(file.size());
+          Serial.print(file.size());
+          Serial.println("B");
         }
         file = root.openNextFile();
       }
@@ -112,8 +113,8 @@ class SdCard{
         Serial.println("Failed to open file for reading");
         return;
       }
-
-      Serial.print("Read from file: ");
+      Serial.println("Read from file: ");
+      Serial.println();
       while (file.available()) {
         Serial.write(file.read());
       }
@@ -137,18 +138,26 @@ class SdCard{
       file.close();
     }
 
-    void appendFile(fs::FS &fs, const char *path, const char *message) {
-      Serial.printf("Appending to file: %s\n", path);
+    void appendFile(fs::FS &fs, const char *path, const char *message, bool background=false) {
+      if (!background) {
+        Serial.printf("Appending to file: %s\n", path);
+      }
 
       File file = fs.open(path, FILE_APPEND);
       if (!file) {
-        Serial.println("Failed to open file for appending");
+        if (!background) {
+          Serial.println("Failed to open file for appending");
+        }
         return;
       }
       if (file.print(message)) {
-        Serial.println("Message appended");
+        if (!background) {
+          Serial.println("Message appended");
+        }
       } else {
-        Serial.println("Append failed");
+        if (!background) {
+          Serial.println("Append failed");
+        }
       }
       file.close();
     }

@@ -13,6 +13,7 @@
 #include "touch.h"
 #include "mv.h"
 #include "cp.h"
+#include "history.h"
 
 
 class MainFuncs{
