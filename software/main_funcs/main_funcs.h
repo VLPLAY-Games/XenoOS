@@ -7,6 +7,7 @@
 #include "mkdir.h"
 #include "rename.h"
 #include "rm.h"
+#include "hash.h"
 #include "wget.h"
 #include "sys_update.h"
 #include "mac.h"
@@ -14,7 +15,6 @@
 #include "mv.h"
 #include "cp.h"
 #include "history.h"
-
 
 class MainFuncs{
   private:
@@ -35,11 +35,15 @@ class MainFuncs{
     }
     void info(Esp esp){
       Serial.println(os_name);
-      Serial.print("Version ");
+      Serial.print("Core Version ");
+      Serial.println(core_version);
+      Serial.print("Core Date ");
+      Serial.println(core_date);
+      Serial.print("OS Version ");
       Serial.println(os_version);
-      Serial.println(made_by);
       Serial.print("OS Date ");
       Serial.println(os_date);
+      Serial.println(made_by);
       esp.print_all_info();
       Serial.println(os_github);
     }
