@@ -31,4 +31,10 @@ class Timer {
       Serial.print(get_sec(), 3);  // Печатаем время с точностью до 3 знаков после запятой
       Serial.print("] ");
     }
+
+    // Утилита для вывода лога с таймером
+    void log_with_timer(const String& message) {
+      print_time();
+      Serial.println(message);
+    }
 };

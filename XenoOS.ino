@@ -1,15 +1,24 @@
-
 #include "software/config.h"
-#include "core/modules/timer.h"
-#include "software/main_funcs/help.h"
-#include "software/serialconnection.h"
 #include "core/config.h"
+#include "boot/config.h"
+
+#include "software/main_funcs/help.h"
+
+#include "core/modules/timer.h"
+#include "core/modules/wifi.h"
+
 #include "core/crypto/md5.h"
+#include "core/crypto/sha1.h"
+
 #include "core/hardware/esp.h"
 #include "core/hardware/sdcard.h"
-#include "core/modules/wifi.h"
+#include "core/hardware/i2c.h"
+#include "core/hardware/spiffs.h"
+
+#include "software/serialconnection.h"
 #include "software/main_funcs/main_funcs.h"
 #include "software/software.h"
+
 #include "boot/recovery.h"
 #include "boot/bootloader.h"
 

@@ -87,6 +87,9 @@ class System {
         } else if (!command.empty() && command[0] == "hash") {
           Hash hash;
           hash.handle_hash_commands(command, sd);
+        } else if (!command.empty() && command[0] == "ping") {
+          Wifi_ping wifi_ping;
+          wifi_ping.handle_ping_commands(command);
         } else if (sc.get_input() == "free") funcs.free(esp);
         else if (sc.get_input() == "update") funcs.update();
         else if (sc.get_input() == "clear") funcs.clear();

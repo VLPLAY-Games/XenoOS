@@ -15,6 +15,7 @@
 #include "mv.h"
 #include "cp.h"
 #include "history.h"
+#include "ping.h"
 
 class MainFuncs{
   private:

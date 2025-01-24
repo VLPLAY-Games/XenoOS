@@ -10,6 +10,8 @@ class Md5 {
                 Serial.printf("Failed to open file: %s\n", file_path);
                 return ""; // Возвращаем пустую строку, если файл открыть не удалось
             }
+            
+            Serial.println("Started calculating hash MD5");
 
             MD5Builder md5; // Создаем объект MD5Builder
             md5.begin(); // Инициализируем подсчёт MD5
@@ -33,6 +35,7 @@ class Md5 {
 
         // Функция для подсчёта MD5-хэша строки
         String calculate_md5_string(const String& input) {
+            Serial.println("Started calculating hash MD5");
             MD5Builder md5; // Создаем объект MD5Builder
             md5.begin(); // Инициализируем подсчёт MD5
             md5.add(input.c_str()); // Добавляем строку для обработки
@@ -45,6 +48,7 @@ class Md5 {
 
         // Функция для подсчёта MD5-хэша массива данных
         String calculate_md5_data(const uint8_t* data, size_t length) {
+            Serial.println("Started calculating hash MD5");
             MD5Builder md5; // Создаем объект MD5Builder
             md5.begin(); // Инициализируем подсчёт MD5
             md5.add(data, length); // Добавляем массив данных для обработки

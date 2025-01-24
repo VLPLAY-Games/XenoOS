@@ -27,7 +27,7 @@ class SdCard{
         return;
       }
       timer.print_time();
-      Serial.print("SD Card Type: ");
+      Serial.print("  SD Card Type: ");
       if(cardType == CARD_MMC){
         Serial.println("MMC");
       } else if(cardType == CARD_SD){
@@ -40,9 +40,9 @@ class SdCard{
       cardSize = SD.cardSize() / (1024 * 1024);
       cardUsage = SD.usedBytes() / (1024 * 1024);
       timer.print_time();
-      Serial.printf("SD Card Size: %lluMB\n", cardSize);
+      Serial.printf("  SD Card Size: %lluMB\n", cardSize);
       timer.print_time();
-      Serial.printf("SD Card Used space: %lluMB\n", cardUsage);
+      Serial.printf("  SD Card Used space: %lluMB\n", cardUsage);
       current_directory = "/";
       timer.print_time();
       Serial.println("Changed current directory to /");
