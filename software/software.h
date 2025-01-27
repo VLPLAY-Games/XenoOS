@@ -4,10 +4,10 @@ class System {
     SerialConnection sc;
     Help help;
     History history;
-    const char* system_commands[4] = {"restart", "info", "update", "help"}; // Массив строк с командами
+    const char* system_commands[5] = {"restart", "info", "update", "diagnostic", "help"}; // Массив строк с командами
 
 
-    void handle_system_commands(const std::vector<String>& command, Esp esp, SdCard sd, Wifi wifi) {
+    void handle_system_commands(const std::vector<String>& command, Esp esp, SdCard sd, Wifi wifi, Spiffs spiffs) {
       if (command.size() < 2) {
         Serial.println("Incomplete system command");
         return;
@@ -17,6 +17,9 @@ class System {
         funcs.restart(esp);
       } else if (command[1] == "info") {
         funcs.info(esp);
+      } else if (command[1] == "diagnostic") {
+        Diagnostics diagnostic(esp, spiffs, sd);
+        diagnostic.diagnostics();
       } else if (command[1] == "update") {
         Wget wget(wifi, sd);
         SystemUpdate upd(wget, esp);
@@ -33,7 +36,7 @@ class System {
     }
 
   public:
-    void check_input(Esp esp, Wifi wifi, SdCard sd) {
+    void check_input(Esp esp, Wifi wifi, SdCard sd, Spiffs spiffs) {
       sc.read_serial();
       if (sc.get_input().length() > 0) {
         Serial.println(sc.get_input());
@@ -41,7 +44,7 @@ class System {
         auto command = sc.get_command();
 
         if (!command.empty() && command[0] == "system") {
-          handle_system_commands(command, esp, sd, wifi);
+          handle_system_commands(command, esp, sd, wifi, spiffs);
         } else if (!command.empty() && command[0] == "cd") {
           Cd cd;
           cd.handle_cd_commands(command, sd);
@@ -58,9 +61,11 @@ class System {
           Cpu cpu;
           cpu.handle_cpu_commands(command, esp);
         } else if (!command.empty() && command[0] == "sdcard") {
-          sd.handle_sdcard_commands(command);
+          Sd sd_task;
+          sd_task.handle_sdcard_commands(command, sd);
         } else if (!command.empty() && command[0] == "wifi") {
-          wifi.handle_wifi_commands(command);
+          Wifi_T wf;
+          wf.handle_wifi_commands(command, wifi);
         } else if (!command.empty() && command[0] == "wget") {
           Wget wget(wifi, sd);
           wget.handle_wget_commands(command);

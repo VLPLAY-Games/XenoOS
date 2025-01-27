@@ -6,51 +6,64 @@ extern String current_directory = "/";
 extern uint8_t cardType = 0;
 extern uint64_t cardSize = 0;
 extern uint64_t cardUsage = 0;
-extern bool card_init = false;
+// extern bool card_init = false;
 
 class SdCard{
   private:
-    Help help;
-    const char* sdcard_commands[2] = {"info", "help"}; // Массив строк с командами
-  public:
-    void init(Timer timer){
-      if(!SD.begin()){
-        timer.print_time();
-        Serial.println("Card Mount Failed");
-        return;
+    
+    bool mount_sd(Timer* timer = nullptr) {
+      if (!SD.begin()) {
+        if (timer) {
+          timer->println_with_timer("Card Mount Failed");
+        } else {
+          Serial.println("Card Mount Failed");
+        }
+        return false;
       }
+
       cardType = SD.cardType();
 
-      if(cardType == CARD_NONE){
+      if (cardType == CARD_NONE) {
+        if (timer) {
+          timer->println_with_timer("No SD card attached");
+        } else {
+          Serial.println("No SD card attached");
+        }
+        return false;
+      }
+      return true;
+    }
+    
+  public:
+    bool init(Timer timer){
+      if (mount_sd(&timer)) {
+        timer.print_with_timer("  SD Card Type: ");
+        if(cardType == CARD_MMC){
+          Serial.println("MMC");
+        } else if(cardType == CARD_SD){
+          Serial.println("SDSC");
+        } else if(cardType == CARD_SDHC){
+          Serial.println("SDHC");
+        } else {
+          Serial.println("UNKNOWN");
+        }
+        cardSize = SD.cardSize() / (1024 * 1024);
+        cardUsage = SD.usedBytes() / (1024 * 1024);
         timer.print_time();
-        Serial.println("No SD card attached");
-        return;
+        Serial.printf("  SD Card Size: %lluMB\n", cardSize);
+        timer.print_time();
+        Serial.printf("  SD Card Used space: %lluMB\n", cardUsage);
+        current_directory = "/";
+        timer.println_with_timer("Changed current directory to /");
+        // card_init = true;
+        timer.println_with_timer("");
+        timer.println_with_timer("SD Card Loaded");
+        return true;
       }
-      timer.print_time();
-      Serial.print("  SD Card Type: ");
-      if(cardType == CARD_MMC){
-        Serial.println("MMC");
-      } else if(cardType == CARD_SD){
-        Serial.println("SDSC");
-      } else if(cardType == CARD_SDHC){
-        Serial.println("SDHC");
-      } else {
-        Serial.println("UNKNOWN");
+      else {
+        timer.println_with_timer("SD Card Not Loaded");
+        return false;
       }
-      cardSize = SD.cardSize() / (1024 * 1024);
-      cardUsage = SD.usedBytes() / (1024 * 1024);
-      timer.print_time();
-      Serial.printf("  SD Card Size: %lluMB\n", cardSize);
-      timer.print_time();
-      Serial.printf("  SD Card Used space: %lluMB\n", cardUsage);
-      current_directory = "/";
-      timer.print_time();
-      Serial.println("Changed current directory to /");
-      card_init = true;
-      timer.print_time();
-      Serial.println("");
-      timer.print_time();
-      Serial.println("SD Card Loaded");
     }
 
 
@@ -253,25 +266,6 @@ class SdCard{
       Serial.println("===========================");
     }
 
-    void handle_sdcard_commands(const std::vector<String>& command) {
-      if (command.size() < 2) {
-        Serial.println("Incomplete sdcard command");
-        return;
-      }
-
-      if (command[1] == "info") {
-        print_info();
-      }
-      // Обработка команды "help"
-      else if (command[1] == "help") {
-        Serial.print("Available sdcard commands: ");
-        help.print_help(sdcard_commands, sizeof(sdcard_commands) / sizeof(sdcard_commands[0]));
-      } 
-      else {
-        Serial.println("Unknown sdcard command");
-      }
-    }
-
     bool is_exists(const char* path){
       if (SD.exists(path)){
         return true;
@@ -279,7 +273,7 @@ class SdCard{
       return false;
     }
 
-    // Новая функция: Изменение текущего каталога
+    // Изменение текущего каталога
     void change_directory(const String& path) {
       String resolved_path = resolve_path(path);
       if (is_directory(resolved_path)) {
@@ -292,7 +286,7 @@ class SdCard{
       }
     }
 
-    // Новая функция: Перемещение файла
+    // Перемещение файла
     void move_file(const char* source_path, const char* destination_path) {
       Serial.printf("Moving file from %s to %s\n", source_path, destination_path);
 
@@ -337,7 +331,7 @@ class SdCard{
       destination.close();
     }
 
-    // Новая функция: Подсчет файлов в директории
+    // Подсчет файлов в директории
     size_t count_files(const char* directory_path) {
       size_t file_count = 0;
       File dir = SD.open(directory_path);
@@ -356,7 +350,7 @@ class SdCard{
       return file_count;
     }
 
-    // Новая функция: Чтение строки из файла
+    // Чтение строки из файла
     String read_line(File& file) {
       String line = "";
       while (file.available()) {
@@ -367,7 +361,7 @@ class SdCard{
       return line;
     }
 
-    // Новая функция: Поиск файла
+    // Поиск файла
     bool find_file(const char* directory_path, const char* filename) {
       File dir = SD.open(directory_path);
       if (!dir || !dir.isDirectory()) {
@@ -385,7 +379,7 @@ class SdCard{
       return false;
     }
     
-    // Новая функция: Получение размера файла
+    // Получение размера файла
     size_t get_file_size(const char* file_path) {
       File file = SD.open(file_path);
       if (!file) {
@@ -415,5 +409,67 @@ class SdCard{
 
       Serial.println("Empty file created successfully");
       file.close();
+    }
+
+    // Проверка типа файла
+    String get_file_type(const char* file_path) {
+      File file = SD.open(file_path);
+      if (!file) {
+        Serial.println("Failed to open file for checking type");
+        return "";
+      }
+      
+      String fileType = "";
+      // Проверяем, является ли это каталогом или обычным файлом
+      if (file.isDirectory()) {
+        fileType = "Directory";
+      } else {
+        fileType = "File";
+      }
+
+      file.close();
+      return fileType;
+    }
+
+    // Функция диагностики
+    void diagnostics() {
+      Serial.println("=== Starting SD Card Diagnostics ===");
+
+      // Проверка инициализации
+      if (mount_sd()) {
+        Serial.println("SD Card is initialized");
+      } else {
+        Serial.println("Error: SD Card is not initialized");
+        return; // Прекращаем диагностику, если карта не инициализирована
+      }
+
+      // Проверка объёма памяти
+      Serial.printf("Total Space: %u MB\n", cardSize);
+      Serial.printf("Used Space: %u MB\n", cardUsage);
+      if (cardSize > 0 && cardUsage <= cardSize) {
+        Serial.println("SD Card memory check passed");
+      } else {
+        Serial.println("Error: Invalid memory values detected on SD Card.");
+      }
+
+      // Проверка файловой системы
+      if (SD.exists("/")) {
+        Serial.println("Filesystem check passed");
+      } else {
+        Serial.println("Error: Filesystem not found or corrupted.");
+      }
+
+      // Проверка возможности записи с использованием writeFile
+      const char *test_file_path = "/test.txt";
+      const char *test_message = "SD Card Write Test";
+      writeFile(SD, test_file_path, test_message);
+      if (SD.exists(test_file_path)) {
+        SD.remove(test_file_path);
+        Serial.println("Write Test: Successful");
+      } else {
+        Serial.println("Error: Write Test Failed.");
+      }
+
+      Serial.println("=== SD Card Diagnostics Complete ===");
     }
 };

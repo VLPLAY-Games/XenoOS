@@ -168,4 +168,67 @@ class Spiffs {
     bool isMounted() {
       return SPIFFS.begin(true);
     }
+
+    // Функция диагностики SPIFFS
+    void diagnostics() {
+      Serial.println("=== SPIFFS Diagnostics ===");
+
+      // Проверка инициализации
+      if (!SPIFFS.begin(true)) {
+        Serial.println("Error: SPIFFS not initialized.");
+        return;
+      }
+      Serial.println("SPIFFS initialized successfully.");
+
+      // Получение общей и используемой памяти
+      size_t totalBytes = SPIFFS.totalBytes();
+      size_t usedBytes = SPIFFS.usedBytes();
+
+      Serial.printf("Total Space: %u KB\n", totalBytes / 1024);
+      Serial.printf("Used Space: %u KB\n", usedBytes / 1024);
+
+      if (totalBytes > 0 && usedBytes <= totalBytes) {
+        Serial.println("SPIFFS memory check passed");
+      } else {
+        Serial.println("Error: Invalid memory values detected in SPIFFS.");
+      }
+
+      // Проверка доступности файловой системы
+      if (!isMounted()) {
+        Serial.println("Error: Filesystem not mounted.");
+        return;
+      } else {
+        Serial.println("Filesystem mounted successfully.");
+      }
+
+      // Тест создания, записи, чтения и удаления файла
+      const char* testFilePath = "/spiffs_test.txt";
+      const char* testMessage = "SPIFFS Diagnostics Test Message";
+
+      Serial.println("Performing file operations for diagnostics...");
+
+      // Тест записи
+      if (writeFile(testFilePath, testMessage)) {
+        Serial.println("Write Test: Successful");
+
+        // Тест чтения
+        String content = readFile(testFilePath);
+        if (content == testMessage) {
+          Serial.println("Read Test: Successful");
+        } else {
+          Serial.println("Error: Read Test Failed. Content mismatch.");
+        }
+
+        // Удаление тестового файла
+        if (deleteFile(testFilePath)) {
+          Serial.println("Delete Test: Successful");
+        } else {
+          Serial.println("Error: Delete Test Failed.");
+        }
+      } else {
+        Serial.println("Error: Write Test Failed.");
+      }
+
+      Serial.println("=== SPIFFS Diagnostics Complete ===");
+    }
 };

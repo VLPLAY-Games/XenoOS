@@ -16,6 +16,9 @@
 #include "cp.h"
 #include "history.h"
 #include "ping.h"
+#include "sdcard.h"
+#include "wifi.h"
+#include "diagnostic.h"
 
 class MainFuncs{
   private:

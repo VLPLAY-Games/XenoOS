@@ -273,4 +273,52 @@ class Esp {
         default: Serial.println("NO_MEAN");
       }
     }
+
+    // Функция диагностики
+    void diagnostics() {
+      Serial.println("=== Starting ESP32 Diagnostics ===");
+
+      // Проверка модели чипа
+      String model = chip_model();
+      if (model.indexOf("ESP32") != -1) { // Проверяем, содержит ли строка "ESP32"
+        Serial.println("Chip Model is valid: " + model);
+      } else {
+        Serial.println("Error: Unexpected chip model detected: " + model);
+      }
+
+      // Проверка частоты процессора
+      uint32_t freq = cpu_freq();
+      if (freq >= 80 && freq <= 240) {
+        Serial.println("CPU Frequency is within range");
+      } else {
+        Serial.println("Error: CPU frequency out of range!");
+      }
+
+      // Проверка числа ядер
+      uint8_t cores = chip_cores();
+      if (cores == 1 || cores == 2) {
+        Serial.println("Number of CPU Cores is valid");
+      } else {
+        Serial.println("Warning: Unexpected number of CPU cores detected!");
+      }
+
+      // Проверка общей памяти программ
+      uint32_t prog_mem = total_program_memory();
+      if (prog_mem >= 4000) {
+        Serial.println("Program memory size is valid");
+      } else {
+        Serial.println("Error: Program memory below expected size!");
+      }
+
+      // Проверка RAM
+      uint32_t ram = total_ram();
+      if (ram >= 512) {
+        Serial.println("RAM size is valid");
+      } else {
+        Serial.println("Error: RAM below expected size!");
+      }
+
+      Serial.println("=== ESP32 Diagnostics Complete ===");
+      Serial.println("ESP32 Diagnostics finished.");
+    }
 };

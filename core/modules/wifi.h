@@ -1,10 +1,6 @@
 #include <WiFi.h>
 
 class Wifi {
-  private:
-    const char* wifi_commands[7] = {"connect", "disconnect", "reconnect", "scan", "status", "ip", "help"}; // Массив строк с командами
-    Help help;
-
   public:
     // Подключение к WiFi
     void connect_wifi(const char* ssid, const char* password) {
@@ -125,37 +121,6 @@ class Wifi {
       }
       Serial.println("");
       WiFi.scanDelete();
-    }
-
-    // Обработка команд WiFi
-    void handle_wifi_commands(const std::vector<String>& command) {
-      if (command.size() < 2) {
-        Serial.println("Incomplete wifi command");
-        return;
-      }
-
-      if (command[1] == "connect") {
-        if (command.size() < 4) {
-          Serial.println("Incomplete wifi connect command");
-          return;
-        }
-        connect_wifi(command[2].c_str(), command[3].c_str());
-      } else if (command[1] == "disconnect") {
-        disconnect_wifi();
-      } else if (command[1] == "reconnect") {
-        reconnect_wifi();
-      } else if (command[1] == "scan") {
-        scan_wifi();
-      } else if (command[1] == "status") {
-        wifi_status();
-      } else if (command[1] == "ip") {
-        get_ip_address();
-      } else if (command[1] == "help") {
-        Serial.print("Available wifi commands: ");
-        help.print_help(wifi_commands, sizeof(wifi_commands) / sizeof(wifi_commands[0]));
-      } else {
-        Serial.println("Unknown wifi command");
-      }
     }
 
     // Метод для проверки подключения к WiFi

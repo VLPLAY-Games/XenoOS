@@ -33,8 +33,13 @@ class Timer {
     }
 
     // Утилита для вывода лога с таймером
-    void log_with_timer(const String& message) {
+    void println_with_timer(const String& message) {
       print_time();
       Serial.println(message);
+    }
+
+    void print_with_timer(const String& message) {
+      print_time();
+      Serial.print(message);
     }
 };
