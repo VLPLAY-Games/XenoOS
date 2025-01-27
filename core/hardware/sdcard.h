@@ -4,9 +4,10 @@
 
 extern String current_directory = "/";
 extern uint8_t cardType = 0;
+extern String cardTypeStr = "";
 extern uint64_t cardSize = 0;
 extern uint64_t cardUsage = 0;
-// extern bool card_init = false;
+extern uint64_t cardFree = 0;
 
 class SdCard{
   private:
@@ -35,27 +36,62 @@ class SdCard{
     }
     
   public:
+
+    // Функция для возврата типа карты SD
+    uint8_t get_cardtype() {
+      cardType = SD.cardType();
+      return cardType;
+    }
+
+    String get_cardtypeStr(){
+      cardType = get_cardtype();
+      if(cardType == CARD_MMC){
+        return "MMC";
+      } else if(cardType == CARD_SD){
+        return "SDSC";
+      } else if(cardType == CARD_SDHC){
+        return "SDHC";
+      } else {
+        return "UNKNOWN";
+      }
+    }
+
+    void update_info(){
+      cardTypeStr = get_cardtypeStr();
+      cardSize = SD.cardSize() / 1024;
+      cardUsage = SD.usedBytes() / 1024;
+      cardFree = cardSize - cardUsage;
+    }
+
+    // Функция для возврата общего размера карты
+    uint64_t get_card_size() {
+      cardSize = SD.cardSize() / 1024;
+      return cardSize;
+    }
+
+    // Функция для возврата использованного пространства на карте
+    uint64_t get_card_usage() {
+      cardUsage = SD.usedBytes() / 1024;
+      return cardUsage;
+    }
+
+    // Функция для возврата использованного пространства на карте
+    uint64_t get_card_free() {
+      cardFree = get_card_size() - get_card_usage();
+      return cardFree;
+    }
+
     bool init(Timer timer){
       if (mount_sd(&timer)) {
         timer.print_with_timer("  SD Card Type: ");
-        if(cardType == CARD_MMC){
-          Serial.println("MMC");
-        } else if(cardType == CARD_SD){
-          Serial.println("SDSC");
-        } else if(cardType == CARD_SDHC){
-          Serial.println("SDHC");
-        } else {
-          Serial.println("UNKNOWN");
-        }
-        cardSize = SD.cardSize() / (1024 * 1024);
-        cardUsage = SD.usedBytes() / (1024 * 1024);
+        Serial.println(get_cardtypeStr());
+        update_info();
         timer.print_time();
-        Serial.printf("  SD Card Size: %lluMB\n", cardSize);
+        Serial.printf("  SD Card Size: %lluKB\n", get_card_size());
         timer.print_time();
-        Serial.printf("  SD Card Used space: %lluMB\n", cardUsage);
+        Serial.printf("  SD Card Used space: %lluKB\n", get_card_usage());
         current_directory = "/";
         timer.println_with_timer("Changed current directory to /");
-        // card_init = true;
         timer.println_with_timer("");
         timer.println_with_timer("SD Card Loaded");
         return true;
@@ -190,20 +226,6 @@ class SdCard{
         Serial.println("File deleted");
       } else {
         Serial.println("Delete failed");
-      }
-    }
-    
-
-    String get_cardtype(){
-      cardType = SD.cardType();
-      if(cardType == CARD_MMC){
-        return "MMC";
-      } else if(cardType == CARD_SD){
-        return "SDSC";
-      } else if(cardType == CARD_SDHC){
-        return "SDHC";
-      } else {
-        return "UNKNOWN";
       }
     }
 
@@ -430,6 +452,49 @@ class SdCard{
       file.close();
       return fileType;
     }
+
+    // Функция для поиска файла в директории и её подкаталогах
+    void search_file(const String& directory, const char* filename) {
+      String normalized_directory = normalize_path(directory); // Нормализуем путь
+      String resolved_directory = resolve_path(normalized_directory); // Разрешаем путь
+      Serial.printf("Searching for file: %s in directory: %s\n", filename, resolved_directory.c_str());
+      bool found = search_in_directory(resolved_directory, filename); // Ищем файл в разрешённой директории
+      if (found) {
+        Serial.println("File found!");
+      } else {
+        Serial.println("File not found");
+      }
+    }
+
+    // Рекурсивная функция для поиска файла в директории и её подкаталогах
+    bool search_in_directory(const String& directory, const char* filename) {
+      File dir = SD.open(directory);  // Открываем указанную директорию на SD-карте
+      if (!dir || !dir.isDirectory()) {
+        Serial.println("Invalid directory for searching file");
+        return false;
+      }
+
+      File file = dir.openNextFile();
+      while (file) {
+        // Если файл найден, вернуть true и напечатать путь
+        if (!file.isDirectory() && strcmp(file.name(), filename) == 0) {
+          Serial.print("Found in directory: ");
+          Serial.println(directory);  // Печатаем путь директории, где найден файл
+          Serial.print("File: ");
+          Serial.println(file.name());
+          return true;
+        }
+        // Если это директория, рекурсивно ищем в ней
+        if (file.isDirectory()) {
+          if (search_in_directory(file.path(), filename)) {  // Рекурсивный вызов для вложенных папок
+            return true;
+          }
+        }
+        file = dir.openNextFile();
+      }
+      return false;
+    }
+
 
     // Функция диагностики
     void diagnostics() {

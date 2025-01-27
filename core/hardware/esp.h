@@ -194,10 +194,10 @@ class Esp {
 
     // check given FS for valid update.bin and perform update if available
     void updateFromFS(fs::FS &fs) {
-      File updateBin = fs.open("/upd/update.bin");
+      File updateBin = fs.open("/upd/firmware.bin");
       if (updateBin) {
         if (updateBin.isDirectory()) {
-          Serial.println("Error, /upd/update.bin is not a file");
+          Serial.println("Error, /upd/firmware.bin is not a file");
           updateBin.close();
           return;
         }
@@ -214,7 +214,7 @@ class Esp {
         updateBin.close();
 
         // when finished remove the binary from sd card to indicate end of the process
-        fs.remove("/upd/update.bin");
+        fs.remove("/upd/firmware.bin");
       } else {
         Serial.println("Could not load update.bin from /upd/");
       }

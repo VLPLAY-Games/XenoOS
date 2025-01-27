@@ -169,6 +169,21 @@ class Spiffs {
       return SPIFFS.begin(true);
     }
 
+    // Функция для получения общего объема памяти
+    uint32_t total_memory() {
+      return SPIFFS.totalBytes();
+    }
+
+    // Функция для получения использованного объема памяти
+    uint32_t used_memory() {
+      return SPIFFS.usedBytes();
+    }
+
+    // Функция для получения оставшегося объема памяти
+    uint32_t free_memory() {
+      return total_memory() - used_memory();
+    }
+
     // Функция диагностики SPIFFS
     void diagnostics() {
       Serial.println("=== SPIFFS Diagnostics ===");

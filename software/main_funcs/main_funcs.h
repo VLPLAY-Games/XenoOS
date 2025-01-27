@@ -19,6 +19,8 @@
 #include "sdcard.h"
 #include "wifi.h"
 #include "diagnostic.h"
+#include "find.h"
+#include "df.h"
 
 class MainFuncs{
   private:
