@@ -22,7 +22,7 @@ class System {
         diagnostic.diagnostics();
       } else if (command[1] == "update") {
         Wget wget(wifi, sd);
-        SystemUpdate upd(wget, esp);
+        SystemUpdate upd(wget, esp, wifi, sd);
         upd.handle_update_commands(command);
       }
       // Обработка команды "help"
@@ -42,6 +42,7 @@ class System {
         Serial.println(sc.get_input());
         sc.split_input_to_command();
         auto command = sc.get_command();
+        Serial.println();
 
         if (!command.empty() && command[0] == "system") {
           handle_system_commands(command, esp, sd, wifi, spiffs);
@@ -101,7 +102,10 @@ class System {
         } else if (!command.empty() && command[0] == "df") {
           DF df(esp, spiffs, sd);
           df.handle_df_commands(command);
-        } else if (sc.get_input() == "free") funcs.free(esp);
+        } else if (!command.empty() && command[0] == "tar") {
+           Tar tar;
+           tar.handle_tar_commands(command);
+        }  else if (sc.get_input() == "free") funcs.free(esp);
         else if (sc.get_input() == "update") funcs.update();
         else if (sc.get_input() == "clear") funcs.clear();
         else if (sc.get_input() == "help") funcs.help_commands();

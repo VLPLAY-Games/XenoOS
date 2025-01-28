@@ -21,6 +21,7 @@
 #include "diagnostic.h"
 #include "find.h"
 #include "df.h"
+#include "tar.h"
 
 class MainFuncs{
   private:

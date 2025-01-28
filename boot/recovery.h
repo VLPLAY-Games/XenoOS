@@ -8,11 +8,16 @@ class RecoveryMode{
     // Инициализация загрузчика
     void initialize_recovery() {
       timer.println_with_timer("Initializing recovery");
-      timer.println_with_timer("Recovery Information:");
+      timer.println_with_timer("");
+      timer.println_with_timer("      Recovery Information");
+      timer.println_with_timer("===========================");
       timer.println_with_timer(String("  Name: ") + rec_name);
       timer.println_with_timer(String("  Version: ") + rec_version);
       timer.println_with_timer(String("  Build Date: ") + rec_date);
+      timer.println_with_timer("===========================");
+      timer.println_with_timer("");
       timer.println_with_timer("Recovery initialization completed.");
+      timer.println_with_timer("");
     }
 
   public:

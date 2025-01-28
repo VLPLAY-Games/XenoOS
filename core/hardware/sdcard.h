@@ -9,15 +9,16 @@ extern uint64_t cardSize = 0;
 extern uint64_t cardUsage = 0;
 extern uint64_t cardFree = 0;
 
-class SdCard{
-  private:
-    
-    bool mount_sd(Timer* timer = nullptr) {
+class SdCard{ 
+  public:
+    bool mount_sd(Timer* timer = nullptr, bool print = false) {
       if (!SD.begin()) {
-        if (timer) {
-          timer->println_with_timer("Card Mount Failed");
-        } else {
-          Serial.println("Card Mount Failed");
+        if (print){
+          if (timer) {
+            timer->println_with_timer("Card Mount Failed");
+          } else {
+            Serial.println("Card Mount Failed");
+          }
         }
         return false;
       }
@@ -25,17 +26,25 @@ class SdCard{
       cardType = SD.cardType();
 
       if (cardType == CARD_NONE) {
-        if (timer) {
-          timer->println_with_timer("No SD card attached");
-        } else {
-          Serial.println("No SD card attached");
+        if (print){
+          if (timer) {
+            timer->println_with_timer("No SD card attached");
+          } else {
+            Serial.println("No SD card attached");
+          }
         }
         return false;
       }
+
+      if (print){
+        if (timer) {
+          timer->println_with_timer("SD Card Mounted successfully");
+        } else {
+          Serial.println("SD Card Mounted successfully");
+        }
+      }
       return true;
     }
-    
-  public:
 
     // Функция для возврата типа карты SD
     uint8_t get_cardtype() {
@@ -87,12 +96,15 @@ class SdCard{
         Serial.println(get_cardtypeStr());
         update_info();
         timer.print_time();
-        Serial.printf("  SD Card Size: %lluKB\n", get_card_size());
+        Serial.printf("  SD Card Size: %llu KB\n", get_card_size());
         timer.print_time();
-        Serial.printf("  SD Card Used space: %lluKB\n", get_card_usage());
+        Serial.printf("  SD Card Used space: %llu KB\n", get_card_usage());
+        timer.print_time();
+        Serial.printf("  SD Card Free space: %llu KB\n", get_card_free());
+        timer.println_with_timer("===========================");
+        timer.println_with_timer("");
         current_directory = "/";
         timer.println_with_timer("Changed current directory to /");
-        timer.println_with_timer("");
         timer.println_with_timer("SD Card Loaded");
         return true;
       }
@@ -283,8 +295,8 @@ class SdCard{
       Serial.println("=== SD Card Information ===");
       Serial.print("SD Card Type: ");
       Serial.println(get_cardtype());
-      Serial.printf("SD Card Size: %lluMB\n", cardSize);
-      Serial.printf("SD Card Used space: %lluMB\n", cardUsage);
+      Serial.printf("SD Card Size: %lluMB\n", get_card_size());
+      Serial.printf("SD Card Used space: %lluMB\n", get_card_usage());
       Serial.println("===========================");
     }
 
@@ -297,13 +309,17 @@ class SdCard{
 
     // Изменение текущего каталога
     void change_directory(const String& path) {
-      String resolved_path = resolve_path(path);
+      // Нормализуем и разрешаем путь
+      String normalized_path = normalize_path(path);
+      String resolved_path = resolve_path(normalized_path);
+
+      // Проверяем существование директории
       if (is_directory(resolved_path)) {
         current_directory = resolved_path;
         Serial.print("Current directory changed to: ");
         Serial.println(current_directory);
       } else {
-        Serial.print("Failed to change directory: Directory doesn't exists ");
+        Serial.print("Failed to change directory: Directory doesn't exist ");
         Serial.println(resolved_path);
       }
     }

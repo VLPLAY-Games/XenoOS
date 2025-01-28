@@ -2,12 +2,14 @@ class SystemUpdate {
   private:
     Wget &wget;                 // Ссылка на объект Wget для загрузки обновлений
     Esp &esp;                   // Ссылка на объект Esp для обновлений
+    Wifi &wifi; 
+    SdCard &sd;
     Help help;                  // Объект для справки
     const char* update_commands[3] = {"download", "install", "help"}; // Список доступных команд для обновлений
 
   public:
     // Конструктор
-    SystemUpdate(Wget &wget_instance, Esp &esp_instance) : wget(wget_instance), esp(esp_instance) {}
+    SystemUpdate(Wget &wget_instance, Esp &esp_instance, Wifi &wifi_instance, SdCard &sd_instance) : wget(wget_instance), esp(esp_instance), wifi(wifi_instance), sd(sd_instance) {}
 
     // Обработка команд update
     void handle_update_commands(const std::vector<String> &command) {
@@ -25,7 +27,12 @@ class SystemUpdate {
 
       // Команда загрузки обновления
       if (command[2] == "download") {
-        check_and_download_update();
+        if (wifi.check_wifi()) {
+          check_and_download_update();
+        } else {
+          return;
+        }
+        
       } 
       // Команда установки обновления
       else if (command[2] == "install") {
@@ -58,31 +65,37 @@ class SystemUpdate {
       
       // Если версия из файла (на сервере) пустая, то ошибка при получении данных
       if (version_info == "") {
-        Serial.println("Failed to get version info from the server.");
-        return;
+          Serial.println("Failed to get version info from the server.");
+          return;
       }
 
       // Разделяем строку на номер версии и хэш
-      String current_version = version_info.substring(0, 3);
-      String version_hash = version_info.substring(4);
+      String current_version = version_info.substring(0, 3); // Версия на сервере в формате "019"
+      String version_hash = version_info.substring(4); // Хэш-сумма
 
-      Serial.printf("Current version: %s, Available version: %s\n", os_version_upd, current_version.c_str());
+      // Форматируем версии
+      String formatted_current_version = String(current_version[0]) + "." + current_version[1] + "." + current_version[2];
+      Serial.printf("Current version: %s, Available version: %s\n", os_version, formatted_current_version.c_str());
 
+      // Сравниваем версии как числа
+      int current_version_int = current_version.toInt();  // Серверная версия
+      int os_version_int = atoi(os_version_upd);              // Локальная версия
       // Если текущая версия системы старее, чем на сервере, обновляем
-      if (current_version.toInt() > atoi(os_version_upd)) {
-        Serial.println("New version available. Starting download...");
+      if (current_version_int > os_version_int) {
+          Serial.println("New version available. Starting download...");
 
-        // Скачиваем прошивку
-        download_firmware();
+          // Скачиваем прошивку
+          download_firmware();
 
-        // Проверка хэш-суммы после скачивания
-        if (!check_firmware_hash(version_hash)) {
-          Serial.println("Error: Firmware hash does not match!");
-        } else {
-          Serial.println("Firmware update download successful.");
-        }
+          // Проверка хэш-суммы после скачивания
+          if (!check_firmware_hash(version_hash)) {
+              Serial.println("Error: Firmware hash does not match!");
+              sd.deleteFile(SD, "/upd/firmware.bin");
+          } else {
+              Serial.println("Firmware update download successful");
+          }
       } else {
-        Serial.println("No update available.");
+          Serial.println("No update available");
       }
     }
 

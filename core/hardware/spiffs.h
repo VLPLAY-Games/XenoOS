@@ -184,6 +184,18 @@ class Spiffs {
       return total_memory() - used_memory();
     }
 
+    void print_info(Timer* timer = nullptr){
+      if (timer) {
+        timer->println_with_timer(String("  SPIFFS Total: ") + (total_memory() / 1024) + String(" KB"));
+        timer->println_with_timer(String("  SPIFFS Used: ") + (used_memory() / 1024) + String(" KB"));
+        timer->println_with_timer(String("  SPIFFS Free: ") + (free_memory() / 1024) + String(" KB"));
+      } else {
+        Serial.printf("  SPIFFS Total: %s KB\n", total_memory() / 1024);
+        Serial.printf("  SPIFFS Used: %s KB\n", used_memory() / 1024);
+        Serial.printf("  SPIFFS Free: %s KB\n", free_memory() / 1024);
+      }
+    }
+
     // Функция диагностики SPIFFS
     void diagnostics() {
       Serial.println("=== SPIFFS Diagnostics ===");
