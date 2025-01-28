@@ -1,8 +1,18 @@
 class Mkdir {
+  private:
+    const char* mkdir_commands[1] = {"help"};  // Обновленный массив команд
+    Help help;
+
   public:
     void handle_mkdir_commands(const std::vector<String>& command, SdCard& sd) {
       if (command.size() < 2) {
         Serial.println("Incomplete mkdir command");
+        return;
+      }
+
+      if (command[1] == "help") {
+        Serial.print("Available mkdir commands: ");
+        help.print_help(mkdir_commands, sizeof(mkdir_commands) / sizeof(mkdir_commands[0]));
         return;
       }
 

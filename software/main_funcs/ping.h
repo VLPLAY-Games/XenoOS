@@ -2,10 +2,11 @@
 
 class Wifi_ping {
   private:
-    Wifi wifi;  // Включаем класс Wifi для работы с подключением Wi-Fi
+    Wifi wifi;
+    const char* ping_commands[1] = {"help"};  // Обновленный массив команд
+    Help help;
 
   public:
-    // Метод для пинга хоста или IP-адреса
     void ping(const String& input) {
       if (!wifi.check_wifi()) {
         Serial.println("Cannot ping, WiFi not connected.");
@@ -15,9 +16,7 @@ class Wifi_ping {
       Serial.printf("Pinging: %s\n", input.c_str());
       IPAddress ip;
 
-      // Проверка, является ли строка допустимым IP-адресом
       if (ip.fromString(input)) {
-        // Если это IP, пингуем его напрямую
         Serial.print("Resolved IP: ");
         Serial.println(ip);
         if (Ping.ping(ip) > 0) {
@@ -26,7 +25,6 @@ class Wifi_ping {
           Serial.println("Ping failed");
         }
       } else {
-        // Если это не IP, пробуем преобразовать в домен и пингуем
         Serial.println("Attempting to resolve host...");
         if (WiFi.hostByName(input.c_str(), ip)) {
           Serial.print("Resolved IP: ");
@@ -42,10 +40,15 @@ class Wifi_ping {
       }
     }
 
-    // Метод для обработки команд пинга
     void handle_ping_commands(const std::vector<String>& command) {
       if (command.size() < 2) {
         Serial.println("Please provide an IP address or hostname to ping");
+        return;
+      }
+
+      if (command[1] == "help") {
+        Serial.print("Available ping commands: ");
+        help.print_help(ping_commands, sizeof(ping_commands) / sizeof(ping_commands[0]));
         return;
       }
 
