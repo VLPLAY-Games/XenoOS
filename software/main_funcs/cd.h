@@ -1,6 +1,6 @@
 class Cd {
   private:
-    const char* cd_commands[2] = {"help"};  // Обновленный массив команд
+    const char* cd_commands[1] = {"help"};  // Обновленный массив команд
     Help help;
 
   public:
