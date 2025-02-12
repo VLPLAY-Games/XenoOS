@@ -10,14 +10,33 @@ class SerialConnection {
       while (Serial.available()) {
         delay(2);
         char c = Serial.read();
-        if (c != '\n') {
-          this->input += c;
+
+        // Обработка клавиши Backspace
+        if (c == 0x08 || c == 0x7F) {  // Код для Backspace
+            if (this->input.length() > 0) {
+                this->input.remove(this->input.length() - 1);  // Удаляем последний символ из строки
+                Serial.print("\b \b");  // Убираем символ на экране
+            }
+        } 
+        // Обработка обычных символов
+        else if (c != '\n' && c != '\r') {
+            Serial.print(c);
+            this->input += c;
         } else {
-          // Когда строка закончилась, разделяем её на слова
-          split_input_to_command();
-        }
+            Serial.println();
+            this->input.trim();  // Удаляем пробелы в начале и конце строки
+                
+            if (this->input.isEmpty()) {
+                Serial.print(current_directory + " $ ");
+            } else {
+                // Когда строка закончилась, разделяем её на слова
+                split_input_to_command();
+            }
+          } 
       }
     }
+
+
 
     void split_input_to_command() {
       String word = "";

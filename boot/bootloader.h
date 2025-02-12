@@ -6,6 +6,7 @@ class Bootloader {
     Esp& esp;
     Timer& timer;
     Spiffs spiffs;
+    Eeprom eeprom;
 
     // Инициализация загрузчика
     void initialize_bootloader() {
@@ -82,6 +83,14 @@ class Bootloader {
         timer.println_with_timer("Failed to load SD Card module.");
       }
 
+      timer.println_with_timer("Checking SD Card Free space...");
+      if (sd.get_card_free() < 256) {
+        timer.println_with_timer("CRITICAL: Not enough free space on SD card. At least 256 KB required.");
+        sd_init = false;
+      } else {
+        timer.println_with_timer("SD Card Free space checked");
+      }
+
       timer.println_with_timer("");
       timer.println_with_timer("Loading SPIFFS module...");
       timer.print_time();
@@ -99,8 +108,26 @@ class Bootloader {
       }
 
       timer.println_with_timer("");
+      timer.println_with_timer("Loading EEPROM module...");
+      timer.print_time();
+      bool eeprom_init = eeprom.init();
 
-      if (sd_init && spiffs_init) {
+      if (eeprom_init) {
+        Serial.println();
+        timer.println_with_timer("     EEPROM Information");
+        timer.println_with_timer("===========================");
+        eeprom.print_info(&timer);
+        timer.println_with_timer("===========================");
+        timer.println_with_timer("");
+        timer.println_with_timer("EEPROM module loaded successfully.");
+      } else {
+        timer.println_with_timer("Failed to load EEPROM module.");
+      }
+
+
+      timer.println_with_timer("");
+
+      if (sd_init && spiffs_init && eeprom_init) {
         boot_success = true;
       }
     }
@@ -109,7 +136,7 @@ class Bootloader {
     void enter_recovery_mode() {
       timer.println_with_timer("   Entering Recovery Mode");
       timer.println_with_timer("");
-      RecoveryMode rm(esp, timer, spiffs, sd);
+      RecoveryMode rm(esp, timer, spiffs, sd, eeprom);
       rm.recovery();
     }
 
@@ -134,8 +161,8 @@ class Bootloader {
 
   public:
     // Конструктор
-    Bootloader(SdCard& sd_instance, Wifi& wifi_instance, Esp& esp_instance, Timer& timer_instance, Spiffs& spiffs_instance)
-      : sd(sd_instance), wifi(wifi_instance), esp(esp_instance), timer(timer_instance), spiffs(spiffs_instance) {
+    Bootloader(SdCard& sd_instance, Wifi& wifi_instance, Esp& esp_instance, Timer& timer_instance, Spiffs& spiffs_instance, Eeprom& eeprom_instance)
+      : sd(sd_instance), wifi(wifi_instance), esp(esp_instance), timer(timer_instance), spiffs(spiffs_instance), eeprom(eeprom_instance) {
       timer.println_with_timer("");
       timer.println_with_timer("Initializing Bootloader");
       initialize_bootloader();

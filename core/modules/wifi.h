@@ -86,7 +86,7 @@ class Wifi {
     // Сканирование доступных сетей
     void scan_wifi() {
       Serial.println("WiFi Scan start");
-      int n = WiFi.scanNetworks();
+      uint8_t n = WiFi.scanNetworks();
       Serial.println("Scan done");
       if (n == 0) {
         Serial.println("No networks found");
@@ -94,7 +94,7 @@ class Wifi {
         Serial.print(n);
         Serial.println(" networks found");
         Serial.println("Nr | SSID                             | RSSI | CH | Encryption");
-        for (int i = 0; i < n; ++i) {
+        for (uint8_t i = 0; i < n; ++i) {
           Serial.printf("%2d", i + 1);
           Serial.print(" | ");
           Serial.printf("%-32.32s", WiFi.SSID(i).c_str());

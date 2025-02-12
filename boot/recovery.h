@@ -4,6 +4,7 @@ class RecoveryMode{
     Timer timer;
     Spiffs spiffs;
     SdCard sd;
+    Eeprom eeprom;
 
     // Инициализация загрузчика
     void initialize_recovery() {
@@ -22,15 +23,15 @@ class RecoveryMode{
 
   public:
     // Конструктор
-    RecoveryMode(Esp& esp_instance, Timer& timer_instance, Spiffs& spiffs_instance, SdCard& sd_instance) 
-      : esp(esp_instance), timer(timer_instance), spiffs(spiffs_instance), sd(sd_instance) {
+    RecoveryMode(Esp& esp_instance, Timer& timer_instance, Spiffs& spiffs_instance, SdCard& sd_instance, Eeprom& eeprom_instance) 
+      : esp(esp_instance), timer(timer_instance), spiffs(spiffs_instance), sd(sd_instance), eeprom(eeprom_instance) {
         initialize_recovery();
     }
 
     
 
     void recovery() {
-      Diagnostics diagnostic(esp, spiffs, sd);
+      Diagnostics diagnostic(esp, spiffs, sd, eeprom);
       timer.println_with_timer("Performing system diagnostics...");
       diagnostic.diagnostics();
 

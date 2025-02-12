@@ -7,7 +7,7 @@ class Md5 {
         String calculate_md5_file(const char* file_path) {
             File file = SD.open(file_path, FILE_READ); // Открываем файл для чтения
             if (!file) {
-                Serial.printf("Failed to open file: %s\n", file_path);
+                Serial.printf("Failed to open file: %s\r\n", file_path);
                 return ""; // Возвращаем пустую строку, если файл открыть не удалось
             }
             
@@ -29,7 +29,7 @@ class Md5 {
             md5.calculate(); // Завершаем подсчёт MD5
             String hash = md5.toString(); // Получаем MD5-хэш в виде строки
 
-            Serial.printf("MD5 hash of file %s: %s\n", file_path, hash.c_str());
+            Serial.printf("MD5 hash of file %s: %s\r\n", file_path, hash.c_str());
             return hash; // Возвращаем хэш
         }
 
@@ -42,7 +42,7 @@ class Md5 {
             md5.calculate(); // Завершаем подсчёт MD5
 
             String hash = md5.toString(); // Получаем MD5-хэш в виде строки
-            Serial.printf("MD5 hash of string \"%s\": %s\n", input.c_str(), hash.c_str());
+            Serial.printf("MD5 hash of string \"%s\": %s\r\n", input.c_str(), hash.c_str());
             return hash; // Возвращаем хэш
         }
 
@@ -55,7 +55,7 @@ class Md5 {
             md5.calculate(); // Завершаем подсчёт MD5
 
             String hash = md5.toString(); // Получаем MD5-хэш в виде строки
-            Serial.printf("MD5 hash of data (%zu bytes): %s\n", length, hash.c_str());
+            Serial.printf("MD5 hash of data (%zu bytes): %s\r\n", length, hash.c_str());
             return hash; // Возвращаем хэш
         }
 };

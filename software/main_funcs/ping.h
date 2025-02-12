@@ -13,14 +13,14 @@ class Wifi_ping {
         return;
       }
 
-      Serial.printf("Pinging: %s\n", input.c_str());
+      Serial.printf("Pinging: %s\r\n", input.c_str());
       IPAddress ip;
 
       if (ip.fromString(input)) {
         Serial.print("Resolved IP: ");
         Serial.println(ip);
         if (Ping.ping(ip) > 0) {
-          Serial.printf("Ping successful! Time: %d ms\n", Ping.minTime());
+          Serial.printf("Ping successful! Time: %d ms\r\n", Ping.minTime());
         } else {
           Serial.println("Ping failed");
         }
@@ -30,7 +30,7 @@ class Wifi_ping {
           Serial.print("Resolved IP: ");
           Serial.println(ip);
           if (Ping.ping(ip) > 0) {
-            Serial.printf("Ping successful! Time: %d ms\n", Ping.minTime());
+            Serial.printf("Ping successful! Time: %d ms\r\n", Ping.minTime());
           } else {
             Serial.println("Ping failed");
           }

@@ -3,12 +3,13 @@ class Diagnostics {
         Esp esp;
         Spiffs spiffs;
         SdCard sd;
+        Eeprom eeprom;
 
     public:
 
         // Конструктор
-        Diagnostics(Esp& esp_instance, Spiffs& spiffs_instance, SdCard& sd_instance) 
-        : esp(esp_instance), spiffs(spiffs_instance), sd(sd_instance) {}
+        Diagnostics(Esp& esp_instance, Spiffs& spiffs_instance, SdCard& sd_instance, Eeprom& eeprom_instance) 
+        : esp(esp_instance), spiffs(spiffs_instance), sd(sd_instance), eeprom(eeprom_instance) {}
 
 
         // Функция диагностики
@@ -29,6 +30,11 @@ class Diagnostics {
             // Диагностика SD-карты
             Serial.println("Checking SD Card...");
             sd.diagnostics();
+            Serial.println();
+
+            // Диагностика EEPROM
+            Serial.println("Checking EEPROM...");
+            eeprom.diagnostics();
             Serial.println();
 
             Serial.println("=== Diagnostics Complete ===");

@@ -23,7 +23,7 @@ class Tar {
 
       File tarFile = SD.open(tar_file, FILE_READ);
       if (!tarFile) {
-        Serial.printf("Failed to open TAR file: %s\n", tar_file);
+        Serial.printf("Failed to open TAR file: %s\r\n", tar_file);
         return;
       }
 
@@ -36,9 +36,9 @@ class Tar {
       TARUnpacker->setTarStatusProgressCallback(BaseUnpacker::defaultTarStatusProgressCallback); // Прогресс статуса
       TARUnpacker->setTarMessageCallback(BaseUnpacker::targzPrintLoggerCallback); // Сообщения TAR
 
-      Serial.printf("Extracting TAR file: %s to %s\n", tar_file, extract_to);
+      Serial.printf("Extracting TAR file: %s to %s\r\n", tar_file, extract_to);
       if (!TARUnpacker->tarStreamExpander(&tarFile, tarFile.size(), SD, extract_to)) {
-        Serial.printf("Extraction failed with error code: %d\n", TARUnpacker->tarGzGetError());
+        Serial.printf("Extraction failed with error code: %d\r\n", TARUnpacker->tarGzGetError());
       } else {
         Serial.println("TAR extraction completed successfully.");
       }
@@ -53,7 +53,7 @@ class Tar {
 
       File targzFile = SD.open(targz_file, FILE_READ);
       if (!targzFile) {
-        Serial.printf("Failed to open TAR.GZ file: %s\n", targz_file);
+        Serial.printf("Failed to open TAR.GZ file: %s\r\n", targz_file);
         return;
       }
 
@@ -67,9 +67,9 @@ class Tar {
       TARGZUnpacker->setTarStatusProgressCallback(BaseUnpacker::defaultTarStatusProgressCallback); // Прогресс статуса
       TARGZUnpacker->setTarMessageCallback(BaseUnpacker::targzPrintLoggerCallback); // Сообщения TAR
 
-      Serial.printf("Extracting TAR.GZ file: %s to %s\n", targz_file, extract_to);
+      Serial.printf("Extracting TAR.GZ file: %s to %s\r\n", targz_file, extract_to);
       if (!TARGZUnpacker->tarGzStreamExpander(&targzFile, SD)) {
-        Serial.printf("Extraction failed with error code: %d\n", TARGZUnpacker->tarGzGetError());
+        Serial.printf("Extraction failed with error code: %d\r\n", TARGZUnpacker->tarGzGetError());
       } else {
         Serial.println("TAR.GZ extraction completed successfully.");
       }
@@ -99,7 +99,7 @@ class Tar {
         const char* extract_to = command[3].c_str();
 
         if (!SD.exists(file)) {
-          Serial.printf("File not found: %s\n", file);
+          Serial.printf("File not found: %s\r\n", file);
           return;
         }
 
@@ -110,7 +110,7 @@ class Tar {
         } else if (filename.endsWith(".tar.gz") || filename.endsWith(".tgz")) {
           extract_targz(file, extract_to);
         } else {
-          Serial.printf("Unsupported file type: %s\n", file);
+          Serial.printf("Unsupported file type: %s\r\n", file);
         }
       } else {
         Serial.println("Invalid tar command");

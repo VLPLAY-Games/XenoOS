@@ -12,7 +12,7 @@ class Rename {
       String resolved_new_name = sdcard.resolve_path(new_name);
 
       if (!SD.exists(resolved_old_name)) {
-        Serial.printf("File not found: %s\n", resolved_old_name.c_str());
+        Serial.printf("File not found: %s\r\n", resolved_old_name.c_str());
         return;
       }
 

@@ -24,7 +24,7 @@ class SHA1Hasher {
     String calculate_sha1_file(const char* file_path) {
       File file = SD.open(file_path, FILE_READ);  // Открываем файл для чтения
       if (!file) {
-        Serial.printf("Failed to open file: %s\n", file_path);
+        Serial.printf("Failed to open file: %s\r\n", file_path);
         return "";  // Если файл не открыт, возвращаем пустую строку
       }
       

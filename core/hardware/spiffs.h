@@ -24,7 +24,7 @@ class Spiffs {
       File file = SPIFFS.open(path, "r");
       String content = "";
       if (!file) {
-        Serial.printf("Failed to open file %s for reading\n", path);
+        Serial.printf("Failed to open file %s for reading\r\n", path);
         return "";
       }
 
@@ -40,13 +40,13 @@ class Spiffs {
     bool writeFile(const char* path, const char* message) {
       File file = SPIFFS.open(path, "w");
       if (!file) {
-        Serial.printf("Failed to open file %s for writing\n", path);
+        Serial.printf("Failed to open file %s for writing\r\n", path);
         return false;
       }
 
       file.print(message);
       file.close();
-      Serial.printf("File %s written successfully\n", path);
+      Serial.printf("File %s written successfully\r\n", path);
       return true;
     }
 
@@ -54,23 +54,23 @@ class Spiffs {
     bool appendFile(const char* path, const char* message) {
       File file = SPIFFS.open(path, "a");
       if (!file) {
-        Serial.printf("Failed to open file %s for appending\n", path);
+        Serial.printf("Failed to open file %s for appending\r\n", path);
         return false;
       }
 
       file.print(message);
       file.close();
-      Serial.printf("Message appended to %s\n", path);
+      Serial.printf("Message appended to %s\r\n", path);
       return true;
     }
 
     // Удаление файла
     bool deleteFile(const char* path) {
       if (SPIFFS.remove(path)) {
-        Serial.printf("File %s deleted successfully\n", path);
+        Serial.printf("File %s deleted successfully\r\n", path);
         return true;
       } else {
-        Serial.printf("Failed to delete file %s\n", path);
+        Serial.printf("Failed to delete file %s\r\n", path);
         return false;
       }
     }
@@ -78,10 +78,10 @@ class Spiffs {
     // Переименование файла
     bool renameFile(const char* oldPath, const char* newPath) {
       if (SPIFFS.rename(oldPath, newPath)) {
-        Serial.printf("File %s renamed to %s\n", oldPath, newPath);
+        Serial.printf("File %s renamed to %s\r\n", oldPath, newPath);
         return true;
       } else {
-        Serial.printf("Failed to rename file %s\n", oldPath);
+        Serial.printf("Failed to rename file %s\r\n", oldPath);
         return false;
       }
     }
@@ -89,10 +89,10 @@ class Spiffs {
     // Проверка существования файла
     bool fileExists(const char* path) {
       if (SPIFFS.exists(path)) {
-        Serial.printf("File %s exists\n", path);
+        Serial.printf("File %s exists\r\n", path);
         return true;
       } else {
-        Serial.printf("File %s does not exist\n", path);
+        Serial.printf("File %s does not exist\r\n", path);
         return false;
       }
     }
@@ -101,7 +101,7 @@ class Spiffs {
     size_t getFileSize(const char* path) {
       File file = SPIFFS.open(path, "r");
       if (!file) {
-        Serial.printf("Failed to open file %s for size check\n", path);
+        Serial.printf("Failed to open file %s for size check\r\n", path);
         return 0;
       }
       size_t size = file.size();
@@ -111,7 +111,7 @@ class Spiffs {
 
     // Список файлов в каталоге
     void listDir(const char* dirPath) {
-      Serial.printf("Listing directory: %s\n", dirPath);
+      Serial.printf("Listing directory: %s\r\n", dirPath);
       File root = SPIFFS.open(dirPath);
       if (!root) {
         Serial.println("Failed to open directory");
@@ -140,20 +140,20 @@ class Spiffs {
     // Создание директории
     bool createDir(const char* path) {
       if (SPIFFS.mkdir(path)) {
-        Serial.printf("Directory %s created\n", path);
+        Serial.printf("Directory %s created\r\n", path);
         return true;
       } else {
-        Serial.printf("Failed to create directory %s\n", path);
+        Serial.printf("Failed to create directory %s\r\n", path);
         return false;
       }
     }
     // Удаление директории
     bool removeDir(const char* path) {
       if (SPIFFS.rmdir(path)) {
-        Serial.printf("Directory %s removed\n", path);
+        Serial.printf("Directory %s removed\r\n", path);
         return true;
       } else {
-        Serial.printf("Failed to remove directory %s\n", path);
+        Serial.printf("Failed to remove directory %s\r\n", path);
         return false;
       }
     }
@@ -190,9 +190,9 @@ class Spiffs {
         timer->println_with_timer(String("  SPIFFS Used: ") + (used_memory() / 1024) + String(" KB"));
         timer->println_with_timer(String("  SPIFFS Free: ") + (free_memory() / 1024) + String(" KB"));
       } else {
-        Serial.printf("  SPIFFS Total: %s KB\n", total_memory() / 1024);
-        Serial.printf("  SPIFFS Used: %s KB\n", used_memory() / 1024);
-        Serial.printf("  SPIFFS Free: %s KB\n", free_memory() / 1024);
+        Serial.printf("  SPIFFS Total: %s KB\r\n", total_memory() / 1024);
+        Serial.printf("  SPIFFS Used: %s KB\r\n", used_memory() / 1024);
+        Serial.printf("  SPIFFS Free: %s KB\r\n", free_memory() / 1024);
       }
     }
 
@@ -202,7 +202,7 @@ class Spiffs {
 
       // Проверка инициализации
       if (!SPIFFS.begin(true)) {
-        Serial.println("Error: SPIFFS not initialized.");
+        Serial.println("ERROR: SPIFFS not initialized.");
         return;
       }
       Serial.println("SPIFFS initialized successfully.");
@@ -211,18 +211,18 @@ class Spiffs {
       size_t totalBytes = SPIFFS.totalBytes();
       size_t usedBytes = SPIFFS.usedBytes();
 
-      Serial.printf("Total Space: %u KB\n", totalBytes / 1024);
-      Serial.printf("Used Space: %u KB\n", usedBytes / 1024);
+      Serial.printf("Total Space: %u KB\r\n", totalBytes / 1024);
+      Serial.printf("Used Space: %u KB\r\n", usedBytes / 1024);
 
       if (totalBytes > 0 && usedBytes <= totalBytes) {
         Serial.println("SPIFFS memory check passed");
       } else {
-        Serial.println("Error: Invalid memory values detected in SPIFFS.");
+        Serial.println("ERROR: Invalid memory values detected in SPIFFS.");
       }
 
       // Проверка доступности файловой системы
       if (!isMounted()) {
-        Serial.println("Error: Filesystem not mounted.");
+        Serial.println("ERROR: Filesystem not mounted.");
         return;
       } else {
         Serial.println("Filesystem mounted successfully.");
@@ -243,17 +243,17 @@ class Spiffs {
         if (content == testMessage) {
           Serial.println("Read Test: Successful");
         } else {
-          Serial.println("Error: Read Test Failed. Content mismatch.");
+          Serial.println("ERROR: Read Test Failed. Content mismatch.");
         }
 
         // Удаление тестового файла
         if (deleteFile(testFilePath)) {
           Serial.println("Delete Test: Successful");
         } else {
-          Serial.println("Error: Delete Test Failed.");
+          Serial.println("ERROR: Delete Test Failed.");
         }
       } else {
-        Serial.println("Error: Write Test Failed.");
+        Serial.println("ERROR: Write Test Failed.");
       }
 
       Serial.println("=== SPIFFS Diagnostics Complete ===");

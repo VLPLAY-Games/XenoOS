@@ -96,11 +96,11 @@ class SdCard{
         Serial.println(get_cardtypeStr());
         update_info();
         timer.print_time();
-        Serial.printf("  SD Card Size: %llu KB\n", get_card_size());
+        Serial.printf("  SD Card Size: %llu KB\r\n", get_card_size());
         timer.print_time();
-        Serial.printf("  SD Card Used space: %llu KB\n", get_card_usage());
+        Serial.printf("  SD Card Used space: %llu KB\r\n", get_card_usage());
         timer.print_time();
-        Serial.printf("  SD Card Free space: %llu KB\n", get_card_free());
+        Serial.printf("  SD Card Free space: %llu KB\r\n", get_card_free());
         timer.println_with_timer("===========================");
         timer.println_with_timer("");
         current_directory = "/";
@@ -116,7 +116,7 @@ class SdCard{
 
 
     void listDir(fs::FS &fs, const char *dirname, uint8_t levels) {
-      Serial.printf("Listing directory: %s\n", dirname);
+      Serial.printf("Listing directory: %s\r\n", dirname);
 
       File root = fs.open(dirname);
       if (!root) {
@@ -148,7 +148,7 @@ class SdCard{
     }
 
     void createDir(fs::FS &fs, const char *path) {
-      Serial.printf("Creating Dir: %s\n", path);
+      Serial.printf("Creating Dir: %s\r\n", path);
       if (fs.mkdir(path)) {
         Serial.println("Dir created");
       } else {
@@ -158,7 +158,7 @@ class SdCard{
 
 
     void removeDir(fs::FS &fs, const char *path) {
-      Serial.printf("Removing Dir: %s\n", path);
+      Serial.printf("Removing Dir: %s\r\n", path);
       if (fs.rmdir(path)) {
         Serial.println("Dir removed");
       } else {
@@ -167,7 +167,7 @@ class SdCard{
     }
 
     void readFile(fs::FS &fs, const char *path) {
-      Serial.printf("Reading file: %s\n", path);
+      Serial.printf("Reading file: %s\r\n", path);
 
       File file = fs.open(path);
       if (!file) {
@@ -184,7 +184,7 @@ class SdCard{
 
 
     void writeFile(fs::FS &fs, const char *path, const char *message) {
-      Serial.printf("Writing file: %s\n", path);
+      Serial.printf("Writing file: %s\r\n", path);
 
       File file = fs.open(path, FILE_WRITE);
       if (!file) {
@@ -201,7 +201,7 @@ class SdCard{
 
     void appendFile(fs::FS &fs, const char *path, const char *message, bool background=false) {
       if (!background) {
-        Serial.printf("Appending to file: %s\n", path);
+        Serial.printf("Appending to file: %s\r\n", path);
       }
 
       File file = fs.open(path, FILE_APPEND);
@@ -224,7 +224,7 @@ class SdCard{
     }
 
     void renameFile(fs::FS &fs, const char *path1, const char *path2) {
-      Serial.printf("Renaming file %s to %s\n", path1, path2);
+      Serial.printf("Renaming file %s to %s\r\n", path1, path2);
       if (fs.rename(path1, path2)) {
         Serial.println("File renamed");
       } else {
@@ -233,7 +233,7 @@ class SdCard{
     }
 
     void deleteFile(fs::FS &fs, const char *path) {
-      Serial.printf("Deleting file: %s\n", path);
+      Serial.printf("Deleting file: %s\r\n", path);
       if (fs.remove(path)) {
         Serial.println("File deleted");
       } else {
@@ -295,8 +295,8 @@ class SdCard{
       Serial.println("=== SD Card Information ===");
       Serial.print("SD Card Type: ");
       Serial.println(get_cardtype());
-      Serial.printf("SD Card Size: %lluMB\n", get_card_size());
-      Serial.printf("SD Card Used space: %lluMB\n", get_card_usage());
+      Serial.printf("SD Card Size: %lluKB\r\n", get_card_size());
+      Serial.printf("SD Card Used space: %lluKB\r\n", get_card_usage());
       Serial.println("===========================");
     }
 
@@ -326,7 +326,7 @@ class SdCard{
 
     // Перемещение файла
     void move_file(const char* source_path, const char* destination_path) {
-      Serial.printf("Moving file from %s to %s\n", source_path, destination_path);
+      Serial.printf("Moving file from %s to %s\r\n", source_path, destination_path);
 
       // Проверяем, существует ли исходный файл
       if (!SD.exists(source_path)) {
@@ -364,7 +364,7 @@ class SdCard{
         destination.write(source.read());
       }
 
-      Serial.printf("File copied from %s to %s\n", source_path, destination_path);
+      Serial.printf("File copied from %s to %s\r\n", source_path, destination_path);
       source.close();
       destination.close();
     }
@@ -430,7 +430,7 @@ class SdCard{
     }
 
     void create_empty_file(const char* path) {
-      Serial.printf("Creating empty file: %s\n", path);
+      Serial.printf("Creating empty file: %s\r\n", path);
 
       // Проверяем, существует ли файл
       if (SD.exists(path)) {
@@ -473,7 +473,7 @@ class SdCard{
     void search_file(const String& directory, const char* filename) {
       String normalized_directory = normalize_path(directory); // Нормализуем путь
       String resolved_directory = resolve_path(normalized_directory); // Разрешаем путь
-      Serial.printf("Searching for file: %s in directory: %s\n", filename, resolved_directory.c_str());
+      Serial.printf("Searching for file: %s in directory: %s\r\n", filename, resolved_directory.c_str());
       bool found = search_in_directory(resolved_directory, filename); // Ищем файл в разрешённой директории
       if (found) {
         Serial.println("File found!");
@@ -520,24 +520,27 @@ class SdCard{
       if (mount_sd()) {
         Serial.println("SD Card is initialized");
       } else {
-        Serial.println("Error: SD Card is not initialized");
+        Serial.println("ERROR: SD Card is not initialized");
         return; // Прекращаем диагностику, если карта не инициализирована
       }
 
       // Проверка объёма памяти
-      Serial.printf("Total Space: %u MB\n", cardSize);
-      Serial.printf("Used Space: %u MB\n", cardUsage);
+      Serial.printf("Total Space: %u KB\r\n", cardSize);
+      Serial.printf("Used Space: %u KB\r\n", cardUsage);
       if (cardSize > 0 && cardUsage <= cardSize) {
         Serial.println("SD Card memory check passed");
       } else {
-        Serial.println("Error: Invalid memory values detected on SD Card.");
+        Serial.println("ERROR: Invalid memory values detected on SD Card.");
+      }
+      if (get_card_free() < 256) {
+        Serial.println("CRITICAL: Not enough free space on SD card. At least 256 KB required.");
       }
 
       // Проверка файловой системы
       if (SD.exists("/")) {
         Serial.println("Filesystem check passed");
       } else {
-        Serial.println("Error: Filesystem not found or corrupted.");
+        Serial.println("ERROR: Filesystem not found or corrupted.");
       }
 
       // Проверка возможности записи с использованием writeFile
@@ -548,7 +551,7 @@ class SdCard{
         SD.remove(test_file_path);
         Serial.println("Write Test: Successful");
       } else {
-        Serial.println("Error: Write Test Failed.");
+        Serial.println("ERROR: Write Test Failed.");
       }
 
       Serial.println("=== SD Card Diagnostics Complete ===");

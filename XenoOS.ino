@@ -12,6 +12,7 @@
 #include "core/hardware/sdcard.h"
 #include "core/hardware/i2c.h"
 #include "core/hardware/spiffs.h"
+#include "core/hardware/eeprom.h"
 
 #include "core/modules/diagnostics.h"
 
@@ -29,15 +30,16 @@ Spiffs spiffs;
 SdCard sd;
 Wifi wifi;
 Esp esp;
+Eeprom eeprom;
 System sys;
 
 
 void setup() {
   Serial.begin(115200);
-  Bootloader bl(sd, wifi, esp, timer, spiffs);
+  Bootloader bl(sd, wifi, esp, timer, spiffs, eeprom);
   bl.boot();
 }
 
 void loop() {
-  sys.check_input(esp, wifi, sd, spiffs);
+  sys.check_input(esp, wifi, sd, spiffs, eeprom);
 }

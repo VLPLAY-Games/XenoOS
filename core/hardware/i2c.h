@@ -2,14 +2,14 @@
 
 class I2C {
   private:
-    int _sdaPin;   // Пин SDA
-    int _sclPin;   // Пин SCL
+    uint8_t _sdaPin;   // Пин SDA
+    uint8_t _sclPin;   // Пин SCL
     int _address;  // Адрес I2C устройства
     bool _initialized = false;  // Статус инициализации
 
   public:
     // Конструктор для инициализации с пинами
-    I2C(int sdaPin = 21, int sclPin = 22) {
+    I2C(uint8_t sdaPin = 21, uint8_t sclPin = 22) {
       _sdaPin = sdaPin;
       _sclPin = sclPin;
     }
@@ -144,14 +144,14 @@ class I2C {
         return;
       }
       Wire.setClock(clockSpeed);
-      Serial.printf("I2C clock set to %d Hz\n", clockSpeed);
+      Serial.printf("I2C clock set to %d Hz\r\n", clockSpeed);
     }
 
     // Сканирование всех устройств на I2C
     void scan() {
       Serial.println("Scanning I2C bus...");
 
-      for (int i = 0; i < 128; i++) {
+      for (uint8_t i = 0; i < 128; i++) {
         Wire.beginTransmission(i);
         uint8_t result = Wire.endTransmission();
         if (result == 0) {

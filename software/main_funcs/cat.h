@@ -15,7 +15,7 @@ class Cat {
 
       // Проверяем, существует ли файл
       if (!SD.exists(resolved_path)) {
-        Serial.printf("File not found: %s\n", resolved_path.c_str());
+        Serial.printf("File not found: %s\r\n", resolved_path.c_str());
         return;
       }
 

@@ -4,10 +4,11 @@ class System {
     SerialConnection sc;
     Help help;
     History history;
+    Eeprom eeprom;
     const char* system_commands[5] = {"restart", "info", "update", "diagnostic", "help"}; // Массив строк с командами
 
 
-    void handle_system_commands(const std::vector<String>& command, Esp esp, SdCard sd, Wifi wifi, Spiffs spiffs) {
+    void handle_system_commands(const std::vector<String>& command, Esp esp, SdCard sd, Wifi wifi, Spiffs spiffs, Eeprom eeprom) {
       if (command.size() < 2) {
         Serial.println("Incomplete system command");
         return;
@@ -18,7 +19,7 @@ class System {
       } else if (command[1] == "info") {
         funcs.info(esp);
       } else if (command[1] == "diagnostic") {
-        Diagnostics diagnostic(esp, spiffs, sd);
+        Diagnostics diagnostic(esp, spiffs, sd, eeprom);
         diagnostic.diagnostics();
       } else if (command[1] == "update") {
         Wget wget(wifi, sd);
@@ -36,16 +37,14 @@ class System {
     }
 
   public:
-    void check_input(Esp esp, Wifi wifi, SdCard sd, Spiffs spiffs) {
+    void check_input(Esp esp, Wifi wifi, SdCard sd, Spiffs spiffs, Eeprom eeprom) {
       sc.read_serial();
-      if (sc.get_input().length() > 0) {
-        Serial.println(sc.get_input());
-        sc.split_input_to_command();
-        auto command = sc.get_command();
+      auto command = sc.get_command();
+      if (!command.empty()) {
         Serial.println();
 
         if (!command.empty() && command[0] == "system") {
-          handle_system_commands(command, esp, sd, wifi, spiffs);
+          handle_system_commands(command, esp, sd, wifi, spiffs, eeprom);
         } else if (!command.empty() && command[0] == "cd") {
           Cd cd;
           cd.handle_cd_commands(command, sd);

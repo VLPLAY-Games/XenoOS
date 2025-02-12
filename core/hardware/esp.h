@@ -39,7 +39,7 @@ class Esp {
     // Вспомогательная функция для расчета уникального ID чипа
     uint32_t calculate_chip_id() {
       uint32_t chipId = 0;
-      for (int i = 0; i < 17; i += 8) {
+      for (uint8_t i = 0; i < 17; i += 8) {
         chipId |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
       }
       return chipId;
@@ -108,32 +108,32 @@ class Esp {
     // Метод для вывода всей информации
     void print_all_info() {
       Serial.println("=== System Information ===");
-      Serial.printf("Free RAM: %u KB\n", free_ram());
-      Serial.printf("Total RAM: %u KB\n", total_ram());
-      Serial.printf("Used RAM: %u KB\n", used_ram());
-      Serial.printf("Total Program Memory: %u KB\n", total_program_memory());
-      Serial.printf("Chip Model: %s\n", chip_model());
-      Serial.printf("Chip Revision: %u\n", chip_revision());
-      Serial.printf("Chip ID: %u\n", chip_id());
-      Serial.printf("CPU Frequency: %u MHz\n", cpu_freq());
-      Serial.printf("Chip Cores: %u\n", chip_cores());
+      Serial.printf("Free RAM: %u KB\r\n", free_ram());
+      Serial.printf("Total RAM: %u KB\r\n", total_ram());
+      Serial.printf("Used RAM: %u KB\r\n", used_ram());
+      Serial.printf("Total Program Memory: %u KB\r\n", total_program_memory());
+      Serial.printf("Chip Model: %s\r\n", chip_model());
+      Serial.printf("Chip Revision: %u\r\n", chip_revision());
+      Serial.printf("Chip ID: %u\r\n", chip_id());
+      Serial.printf("CPU Frequency: %u MHz\r\n", cpu_freq());
+      Serial.printf("Chip Cores: %u\r\n", chip_cores());
       Serial.println("===========================");
     }
 
     // Метод для вывода cpu информации
     void print_cpu_info() {
       Serial.println("=== CPU Information ===");
-      Serial.printf("CPU Frequency: %u MHz\n", cpu_freq());
-      Serial.printf("Chip Cores: %u\n", chip_cores());
+      Serial.printf("CPU Frequency: %u MHz\r\n", cpu_freq());
+      Serial.printf("Chip Cores: %u\r\n", chip_cores());
       Serial.println("===========================");
     }
 
     // Метод для вывода cpu информации
     void print_ram_info() {
       Serial.println("=== Memory Information ===");
-      Serial.printf("Free RAM: %u KB\n", free_ram());
-      Serial.printf("Total RAM: %u KB\n", total_ram());
-      Serial.printf("Used RAM: %u KB\n", used_ram());
+      Serial.printf("Free RAM: %u KB\r\n", free_ram());
+      Serial.printf("Total RAM: %u KB\r\n", total_ram());
+      Serial.printf("Used RAM: %u KB\r\n", used_ram());
       Serial.printf("Total Program Memory: %u KB\n", total_program_memory());
       Serial.println("===========================");
     }
@@ -150,7 +150,7 @@ class Esp {
       if (Update.begin(updateSize)) {
         size_t written = 0;
         uint8_t buffer[128];  // Буфер для записи данных
-        int progress = 0;
+        uint8_t progress = 0;
         size_t totalWritten = 0;
 
         // Чтение и запись данных
@@ -160,10 +160,10 @@ class Esp {
           totalWritten += written;
 
           // Печать прогресса
-          int currentProgress = (totalWritten * 100) / updateSize;  // Вычисляем прогресс в процентах
+          uint8_t currentProgress = (totalWritten * 100) / updateSize;  // Вычисляем прогресс в процентах
           if (currentProgress > progress) {
             progress = currentProgress;
-            Serial.printf("Writing at 0x%08x... (%d%%)\n", totalWritten, progress);
+            Serial.printf("Writing at 0x%08x... (%d%%)\r\n", totalWritten, progress);
           }
         }
 
@@ -172,7 +172,7 @@ class Esp {
         float speed = (totalWritten / 1024.0) / elapsedTime;  // Скорость в KB/s
 
         // Финальный отчет
-        Serial.printf("Wrote %d bytes at 0x%08x in %.1f seconds (effective %.1f kbit/s)...\n", totalWritten, 0x10000, elapsedTime, speed * 8); // Выводим информацию о размере и скорости
+        Serial.printf("Wrote %d bytes at 0x%08x in %.1f seconds (effective %.1f kbit/s)...\r\n", totalWritten, 0x10000, elapsedTime, speed * 8); // Выводим информацию о размере и скорости
 
         if (Update.end()) {
           Serial.println("Update done!");
@@ -232,7 +232,7 @@ class Esp {
     }
 
 
-    void print_reset_reason(int reason) {
+    void print_reset_reason(uint8_t reason) {
       switch (reason) {
         case 1:  Serial.print("POWERON_RESET"); break;          /**<1,  Vbat power on reset*/
         case 3:  Serial.print("SW_RESET"); break;               /**<3,  Software reset digital core*/
@@ -253,7 +253,7 @@ class Esp {
       }
     }
 
-    void verbose_print_reset_reason(int reason) {
+    void verbose_print_reset_reason(uint8_t reason) {
       switch (reason) {
         case 1:  Serial.print("Vbat power on reset"); break;
         case 3:  Serial.print("Software reset digital core"); break;
@@ -283,7 +283,7 @@ class Esp {
       if (model.indexOf("ESP32") != -1) { // Проверяем, содержит ли строка "ESP32"
         Serial.println("Chip Model is valid: " + model);
       } else {
-        Serial.println("Error: Unexpected chip model detected: " + model);
+        Serial.println("ERROR: Unexpected chip model detected: " + model);
       }
 
       // Проверка частоты процессора
@@ -291,7 +291,7 @@ class Esp {
       if (freq >= 80 && freq <= 240) {
         Serial.println("CPU Frequency is within range");
       } else {
-        Serial.println("Error: CPU frequency out of range!");
+        Serial.println("ERROR: CPU frequency out of range!");
       }
 
       // Проверка числа ядер
@@ -299,7 +299,7 @@ class Esp {
       if (cores == 1 || cores == 2) {
         Serial.println("Number of CPU Cores is valid");
       } else {
-        Serial.println("Warning: Unexpected number of CPU cores detected!");
+        Serial.println("WARNING: Unexpected number of CPU cores detected!");
       }
 
       // Проверка общей памяти программ
@@ -307,7 +307,7 @@ class Esp {
       if (prog_mem >= 4000) {
         Serial.println("Program memory size is valid");
       } else {
-        Serial.println("Error: Program memory below expected size!");
+        Serial.println("ERROR: Program memory below expected size!");
       }
 
       // Проверка RAM
@@ -315,7 +315,7 @@ class Esp {
       if (ram >= 512) {
         Serial.println("RAM size is valid");
       } else {
-        Serial.println("Error: RAM below expected size!");
+        Serial.println("ERROR: RAM below expected size!");
       }
 
       Serial.println("=== ESP32 Diagnostics Complete ===");
