@@ -5,6 +5,7 @@ class Wget {
     Help help;
     String default_download_path = "/downloads"; // Путь по умолчанию для загрузки
     const char* wget_commands[2] = {"<url> [<path>]", "help"}; // Массив строк с командами
+    const char* wget_dependencies[1] = {"Help"}; // Список зависимостей
 
     
 
@@ -150,6 +151,9 @@ class Wget {
       if (command[1] == "help") {
         Serial.print("Available wget commands: ");
         help.print_help(wget_commands, sizeof(wget_commands) / sizeof(wget_commands[0]));
+        Serial.print("Dependencies: ");
+        help.print_help(wget_dependencies, sizeof(wget_dependencies) / sizeof(wget_dependencies[0]));
+        return;
       } else {
         String url = command[1];
         String path = command.size() >= 3 ? command[2] : "";

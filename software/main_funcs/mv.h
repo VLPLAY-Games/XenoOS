@@ -1,6 +1,7 @@
 class Mv {
   private:
     const char* mv_commands[1] = {"help"};  // Обновленный массив команд
+    const char* mv_dependencies[1] = {"Help"}; // Список зависимостей
     Help help;
 
   public:
@@ -13,6 +14,8 @@ class Mv {
       if (command[1] == "help") {
         Serial.print("Available mv commands: ");
         help.print_help(mv_commands, sizeof(mv_commands) / sizeof(mv_commands[0]));
+        Serial.print("Dependencies: ");
+        help.print_help(mv_dependencies, sizeof(mv_dependencies) / sizeof(mv_dependencies[0]));
         return;
       }
 

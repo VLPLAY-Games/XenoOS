@@ -3,6 +3,7 @@ class Cat {
     SdCard &sdcard;           // Ссылка на объект SdCard для взаимодействия с файловой системой
     Help help;                // Объект для управления справкой
     const char* cat_commands[2] = {"<path_to_file>", "help"}; // Список доступных команд для cat
+    const char* cat_dependencies[1] = {"Help"}; // Список зависимостей
 
   public:
     // Конструктор
@@ -34,6 +35,8 @@ class Cat {
       if (command[1] == "help") {
         Serial.print("Available cat commands: ");
         help.print_help(cat_commands, sizeof(cat_commands) / sizeof(cat_commands[0]));
+        Serial.print("Dependencies: ");
+        help.print_help(cat_dependencies, sizeof(cat_dependencies) / sizeof(cat_dependencies[0]));
         return;
       }
 

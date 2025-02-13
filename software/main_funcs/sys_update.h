@@ -6,6 +6,7 @@ class SystemUpdate {
     SdCard &sd;
     Help help;                  // Объект для справки
     const char* update_commands[3] = {"download", "install", "help"}; // Список доступных команд для обновлений
+    const char* update_dependencies[1] = {"Help"}; // Список зависимостей
 
   public:
     // Конструктор
@@ -22,6 +23,8 @@ class SystemUpdate {
       if (command[2] == "help") {
         Serial.print("Available update commands: ");
         help.print_help(update_commands, sizeof(update_commands) / sizeof(update_commands[0]));
+        Serial.print("Dependencies: ");
+        help.print_help(update_dependencies, sizeof(update_dependencies) / sizeof(update_dependencies[0]));
         return;
       }
 

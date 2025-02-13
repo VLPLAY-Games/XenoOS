@@ -134,7 +134,7 @@ class Esp {
       Serial.printf("Free RAM: %u KB\r\n", free_ram());
       Serial.printf("Total RAM: %u KB\r\n", total_ram());
       Serial.printf("Used RAM: %u KB\r\n", used_ram());
-      Serial.printf("Total Program Memory: %u KB\n", total_program_memory());
+      Serial.printf("Total Program Memory: %u KB\r\n", total_program_memory());
       Serial.println("===========================");
     }
 
@@ -274,50 +274,83 @@ class Esp {
       }
     }
 
+    float get_cpu_temp() {
+      return temperatureRead();
+    }
+
     // Функция диагностики
     void diagnostics() {
       Serial.println("=== Starting ESP32 Diagnostics ===");
-
+  
+      bool chip_model_status = false;
+      bool cpu_freq_status = false;
+      bool cpu_cores_status = false;
+      bool prog_mem_status = false;
+      bool ram_status = false;
+  
       // Проверка модели чипа
+      Serial.print("Checking chip model... ");
       String model = chip_model();
       if (model.indexOf("ESP32") != -1) { // Проверяем, содержит ли строка "ESP32"
-        Serial.println("Chip Model is valid: " + model);
+          Serial.println("OK");
+          chip_model_status = true;
       } else {
-        Serial.println("ERROR: Unexpected chip model detected: " + model);
+          Serial.println("FAILED");
+          Serial.println("ERROR: Unexpected chip model detected: " + model);
       }
-
+  
       // Проверка частоты процессора
+      Serial.print("Checking CPU frequency... ");
       uint32_t freq = cpu_freq();
       if (freq >= 80 && freq <= 240) {
-        Serial.println("CPU Frequency is within range");
+          Serial.println("OK");
+          cpu_freq_status = true;
       } else {
-        Serial.println("ERROR: CPU frequency out of range!");
+          Serial.println("FAILED");
+          Serial.println("ERROR: CPU frequency out of range!");
       }
-
+  
       // Проверка числа ядер
+      Serial.print("Checking number of CPU cores... ");
       uint8_t cores = chip_cores();
       if (cores == 1 || cores == 2) {
-        Serial.println("Number of CPU Cores is valid");
+          Serial.println("OK");
+          cpu_cores_status = true;
       } else {
-        Serial.println("WARNING: Unexpected number of CPU cores detected!");
+          Serial.println("WARNING");
+          Serial.println("ERROR: Unexpected number of CPU cores detected!");
       }
-
+  
       // Проверка общей памяти программ
+      Serial.print("Checking program memory size... ");
       uint32_t prog_mem = total_program_memory();
       if (prog_mem >= 4000) {
-        Serial.println("Program memory size is valid");
+          Serial.println("OK");
+          prog_mem_status = true;
       } else {
-        Serial.println("ERROR: Program memory below expected size!");
+          Serial.println("FAILED");
+          Serial.println("ERROR: Program memory below expected size!");
       }
-
+  
       // Проверка RAM
+      Serial.print("Checking RAM size... ");
       uint32_t ram = total_ram();
       if (ram >= 512) {
-        Serial.println("RAM size is valid");
+          Serial.println("OK");
+          ram_status = true;
       } else {
-        Serial.println("ERROR: RAM below expected size!");
+          Serial.println("FAILED");
+          Serial.println("ERROR: RAM below expected size!");
       }
-
+  
+      // Вывод итоговых результатов тестов
+      Serial.println("\n=== ESP32 Diagnostics Summary ===");
+      Serial.printf("Chip Model: %s\r\n", chip_model_status ? "PASSED" : "FAILED");
+      Serial.printf("CPU Frequency: %s\r\n", cpu_freq_status ? "PASSED" : "FAILED");
+      Serial.printf("CPU Cores: %s\r\n", cpu_cores_status ? "PASSED" : "FAILED");
+      Serial.printf("Program Memory: %s\r\n", prog_mem_status ? "PASSED" : "FAILED");
+      Serial.printf("RAM Size: %s\r\n", ram_status ? "PASSED" : "FAILED");
+  
       Serial.println("=== ESP32 Diagnostics Complete ===");
       Serial.println("ESP32 Diagnostics finished.");
     }

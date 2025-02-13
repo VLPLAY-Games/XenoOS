@@ -2,6 +2,7 @@ class Rename {
   private:
     SdCard &sdcard;
     const char* rename_commands[2] = {"help", "<old_file_path> <new_file_path>"};  // Обновленный массив команд
+    const char* rename_dependencies[1] = {"Help"}; // Список зависимостей
     Help help;
 
   public:
@@ -28,6 +29,8 @@ class Rename {
       if (command[1] == "help") {
         Serial.print("Available rename commands: ");
         help.print_help(rename_commands, sizeof(rename_commands) / sizeof(rename_commands[0]));
+        Serial.print("Dependencies: ");
+        help.print_help(rename_dependencies, sizeof(rename_dependencies) / sizeof(rename_dependencies[0]));
         return;
       }
 

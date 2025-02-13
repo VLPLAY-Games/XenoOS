@@ -60,37 +60,76 @@ class Eeprom {
       if (timer) {
         timer->println_with_timer(String("  EEPROM Total: ") + eeprom_size + String(" B"));
       } else {
-        Serial.printf("  EEPROM Total: %s B\r\n", eeprom_size);
+        Serial.printf("  EEPROM Total: %u B\r\n", eeprom_size);
       }
     }
 
     // Функция диагностики
     void diagnostics() {
-        Serial.println("=== EEPROM Diagnostics ===");
-
-        // Проверяем, доступна ли EEPROM
-        if (eeprom_init) {
-            Serial.println("EEPROM initialized successfully.");
-        } else {
-            Serial.println("EEPROM initialization failed.");
-        }
-        
-        // Печатаем информацию о размере EEPROM
-        print_info();
-        
-        // Диагностика только для диагностического байта
-        Serial.println("Testing Diagnostic Index (EEPROM[17]):");
-
-        // Запись в диагностический байт (индекс 17)
-        write_diagnostic_info(diagnostic_value);  // Записываем значение diagnostic_value
-        delay(100);
-
-        if (read_diagnostic_info() == diagnostic_value) {
-            Serial.println("Testing Diagnostic Index (EEPROM[17]): Successful");
-        } else {
-            Serial.println("Testing Diagnostic Index (EEPROM[17]): Error");
-        }
-
-        Serial.println("=== EEPROM Diagnostics Complete ===");
-    }
+      Serial.println("=== Starting EEPROM Diagnostics ===");
+  
+      bool init_status = false;
+      bool write_test_status = false;
+      bool read_test_status = false;
+      bool clear_test_status = false;
+      bool skip_tests = true; // Флаг для пропуска тестов, если EEPROM не инициализирована
+  
+      // Проверка инициализации EEPROM
+      Serial.print("Checking EEPROM initialization... ");
+      if (eeprom_init) {
+          Serial.println("OK");
+          init_status = true;
+          skip_tests = false; // Позволяем выполнять остальные тесты
+      } else {
+          Serial.println("FAILED");
+          Serial.println("ERROR: EEPROM is not initialized. Skipping diagnostics.");
+      }
+  
+      // Печать информации о размере EEPROM (если инициализировано)
+      if (!skip_tests) {
+          print_info();
+      }
+  
+      // Тест диагностического индекса EEPROM[17] (если инициализировано)
+      if (!skip_tests) {
+          Serial.println("Testing Diagnostic Index (EEPROM[17])...");
+  
+          // Запись в диагностический байт (индекс 17)
+          Serial.print("Writing diagnostic value... ");
+          write_diagnostic_info(diagnostic_value);
+          delay(100);
+  
+          // Проверяем, правильно ли записалось
+          Serial.print("Verifying written value... ");
+          if (read_diagnostic_info() == diagnostic_value) {
+              write_test_status = true;
+          } else {
+              Serial.println("FAILED");
+              Serial.println("ERROR: Diagnostic Index write test failed.");
+          }
+  
+          // Очистка диагностического байта (запись 0x00)
+          Serial.print("Clearing Diagnostic Index... ");
+          write_diagnostic_info(0x00);
+          delay(100);
+  
+          // Проверяем, успешно ли очищено
+          Serial.print("Verifying clear operation... ");
+          if (read_diagnostic_info() == 0x00) {
+              clear_test_status = true;
+          } else {
+              Serial.println("FAILED");
+              Serial.println("ERROR: Failed to clear Diagnostic Index.");
+          }
+      }
+  
+      // Вывод итоговых результатов тестов
+      Serial.println("\n=== EEPROM Diagnostics Summary ===");
+      Serial.printf("Initialization: %s\r\n", init_status ? "PASSED" : "FAILED");
+      Serial.printf("Write Test: %s\r\n", skip_tests ? "SKIPPED" : (write_test_status ? "PASSED" : "FAILED"));
+      Serial.printf("Read Test: %s\r\n", skip_tests ? "SKIPPED" : (read_test_status ? "PASSED" : "FAILED"));
+      Serial.printf("Clear Test: %s\r\n", skip_tests ? "SKIPPED" : (clear_test_status ? "PASSED" : "FAILED"));
+  
+      Serial.println("=== EEPROM Diagnostics Complete ===\n");
+  }
 };

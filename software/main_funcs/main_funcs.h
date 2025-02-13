@@ -18,7 +18,6 @@
 #include "ping.h"
 #include "sdcard.h"
 #include "wifi.h"
-#include "diagnostic.h"
 #include "find.h"
 #include "df.h"
 #include "tar.h"

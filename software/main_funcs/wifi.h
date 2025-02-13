@@ -1,6 +1,7 @@
 class Wifi_T{
     private:
         const char* wifi_commands[7] = {"connect", "disconnect", "reconnect", "scan", "status", "ip", "help"}; // Массив строк с командами
+        const char* wifi_dependencies[1] = {"Help"}; // Список зависимостей
         Help help;
     public:
         // Обработка команд WiFi
@@ -29,6 +30,9 @@ class Wifi_T{
             } else if (command[1] == "help") {
                 Serial.print("Available wifi commands: ");
                 help.print_help(wifi_commands, sizeof(wifi_commands) / sizeof(wifi_commands[0]));
+                Serial.print("Dependencies: ");
+                help.print_help(wifi_dependencies, sizeof(wifi_dependencies) / sizeof(wifi_dependencies[0]));
+                return;
             } else {
                 Serial.println("Unknown wifi command");
             }

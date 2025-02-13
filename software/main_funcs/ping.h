@@ -4,6 +4,7 @@ class Wifi_ping {
   private:
     Wifi wifi;
     const char* ping_commands[1] = {"help"};  // Обновленный массив команд
+    const char* ping_dependencies[1] = {"Help"}; // Список зависимостей
     Help help;
 
   public:
@@ -49,6 +50,8 @@ class Wifi_ping {
       if (command[1] == "help") {
         Serial.print("Available ping commands: ");
         help.print_help(ping_commands, sizeof(ping_commands) / sizeof(ping_commands[0]));
+        Serial.print("Dependencies: ");
+        help.print_help(ping_dependencies, sizeof(ping_dependencies) / sizeof(ping_dependencies[0]));
         return;
       }
 

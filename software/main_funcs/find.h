@@ -1,6 +1,7 @@
 class Find {
   private:
     const char* find_commands[1] = {"help"}; // Массив строк с командами
+    const char* find_dependencies[1] = {"Help"}; // Список зависимостей
     Help help; // Экземпляр класса помощи
 
   public:
@@ -15,6 +16,8 @@ class Find {
         if (command[1] == "help") {
           Serial.print("Available find commands: ");
           help.print_help(find_commands, sizeof(find_commands) / sizeof(find_commands[0]));
+          Serial.print("Dependencies: ");
+          help.print_help(find_dependencies, sizeof(find_dependencies) / sizeof(find_dependencies[0]));
         }
         // Обработка команды поиска
         else {

@@ -1,6 +1,7 @@
 class Touch {
   private:
     const char* touch_commands[1] = {"help"};  // Обновленный массив команд
+    const char* touch_dependencies[1] = {"Help"}; // Список зависимостей
     Help help;
 
   public:
@@ -13,6 +14,8 @@ class Touch {
       if (command[1] == "help") {
         Serial.print("Available touch commands: ");
         help.print_help(touch_commands, sizeof(touch_commands) / sizeof(touch_commands[0]));
+        Serial.print("Dependencies: ");
+        help.print_help(touch_dependencies, sizeof(touch_dependencies) / sizeof(touch_dependencies[0]));
         return;
       }
 

@@ -1,6 +1,7 @@
 class Mac {
   private:
     const char* mac_commands[2] = {"info", "help"}; // Массив строк с командами
+    const char* mac_dependencies[1] = {"Help"}; // Список зависимостей
     Help help;
   public:
 
@@ -19,6 +20,8 @@ class Mac {
         else if (command[1] == "help") {
           Serial.print("Available mac commands: ");
           help.print_help(mac_commands, sizeof(mac_commands) / sizeof(mac_commands[0]));
+          Serial.print("Dependencies: ");
+          help.print_help(mac_dependencies, sizeof(mac_dependencies) / sizeof(mac_dependencies[0]));
         }
         // Неизвестная команда
         else {

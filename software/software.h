@@ -38,7 +38,7 @@ class System {
 
   public:
     void check_input(Esp esp, Wifi wifi, SdCard sd, Spiffs spiffs, Eeprom eeprom) {
-      sc.read_serial();
+      sc.read_serial(sd);
       auto command = sc.get_command();
       if (!command.empty()) {
         Serial.println();

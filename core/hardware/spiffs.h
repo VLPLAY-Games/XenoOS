@@ -198,64 +198,99 @@ class Spiffs {
 
     // Функция диагностики SPIFFS
     void diagnostics() {
-      Serial.println("=== SPIFFS Diagnostics ===");
-
+      Serial.println("=== Starting SPIFFS Diagnostics ===");
+  
+      bool init_status = false;
+      bool memory_status = false;
+      bool mount_status = false;
+      bool write_test_status = false;
+      bool read_test_status = false;
+      bool delete_test_status = false;
+      bool skip_tests = true; // Флаг для пропуска тестов, если SPIFFS не инициализирован
+  
       // Проверка инициализации
-      if (!SPIFFS.begin(true)) {
-        Serial.println("ERROR: SPIFFS not initialized.");
-        return;
-      }
-      Serial.println("SPIFFS initialized successfully.");
-
-      // Получение общей и используемой памяти
-      size_t totalBytes = SPIFFS.totalBytes();
-      size_t usedBytes = SPIFFS.usedBytes();
-
-      Serial.printf("Total Space: %u KB\r\n", totalBytes / 1024);
-      Serial.printf("Used Space: %u KB\r\n", usedBytes / 1024);
-
-      if (totalBytes > 0 && usedBytes <= totalBytes) {
-        Serial.println("SPIFFS memory check passed");
+      Serial.print("Checking SPIFFS initialization... ");
+      if (SPIFFS.begin(true)) {
+          Serial.println("OK");
+          init_status = true;
+          skip_tests = false; // Позволяем выполнять остальные тесты
       } else {
-        Serial.println("ERROR: Invalid memory values detected in SPIFFS.");
+          Serial.println("FAILED");
+          Serial.println("ERROR: SPIFFS not initialized.");
       }
-
-      // Проверка доступности файловой системы
-      if (!isMounted()) {
-        Serial.println("ERROR: Filesystem not mounted.");
-        return;
-      } else {
-        Serial.println("Filesystem mounted successfully.");
+  
+      // Получение информации о памяти (если инициализировано)
+      if (!skip_tests) {
+          Serial.print("Checking SPIFFS memory... ");
+          size_t totalBytes = SPIFFS.totalBytes();
+          size_t usedBytes = SPIFFS.usedBytes();
+          Serial.printf("\n  Total Space: %u KB\r\n", totalBytes / 1024);
+          Serial.printf("  Used Space: %u KB\r\n", usedBytes / 1024);
+          if (totalBytes > 0 && usedBytes <= totalBytes) {
+              memory_status = true;
+          } else {
+              Serial.println("FAILED");
+              Serial.println("ERROR: Invalid memory values detected in SPIFFS.");
+          }
       }
-
-      // Тест создания, записи, чтения и удаления файла
-      const char* testFilePath = "/spiffs_test.txt";
-      const char* testMessage = "SPIFFS Diagnostics Test Message";
-
-      Serial.println("Performing file operations for diagnostics...");
-
-      // Тест записи
-      if (writeFile(testFilePath, testMessage)) {
-        Serial.println("Write Test: Successful");
-
-        // Тест чтения
-        String content = readFile(testFilePath);
-        if (content == testMessage) {
-          Serial.println("Read Test: Successful");
-        } else {
-          Serial.println("ERROR: Read Test Failed. Content mismatch.");
-        }
-
-        // Удаление тестового файла
-        if (deleteFile(testFilePath)) {
-          Serial.println("Delete Test: Successful");
-        } else {
-          Serial.println("ERROR: Delete Test Failed.");
-        }
-      } else {
-        Serial.println("ERROR: Write Test Failed.");
+  
+      // Проверка файловой системы (если инициализировано)
+      if (!skip_tests) {
+          Serial.print("Checking filesystem mount... ");
+          if (isMounted()) {
+              Serial.println("OK");
+              mount_status = true;
+          } else {
+              Serial.println("FAILED");
+              Serial.println("ERROR: Filesystem not mounted.");
+          }
       }
-
-      Serial.println("=== SPIFFS Diagnostics Complete ===");
-    }
+  
+      // Тест создания, записи, чтения и удаления файла (если инициализировано)
+      if (!skip_tests && mount_status) {
+          Serial.println("Performing file operations for diagnostics...");
+          const char* testFilePath = "/spiffs_test.txt";
+          const char* testMessage = "SPIFFS Diagnostics Test Message";
+  
+          // Тест записи
+          Serial.print("Testing write operation... ");
+          if (writeFile(testFilePath, testMessage)) {
+              write_test_status = true;
+  
+              // Тест чтения
+              Serial.print("Testing read operation... ");
+              String content = readFile(testFilePath);
+              if (content == testMessage) {
+                  Serial.println("OK");
+                  read_test_status = true;
+              } else {
+                  Serial.println("FAILED");
+                  Serial.println("ERROR: Read Test Failed. Content mismatch.");
+              }
+  
+              // Удаление тестового файла
+              Serial.print("Testing file deletion... ");
+              if (deleteFile(testFilePath)) {
+                  delete_test_status = true;
+              } else {
+                  Serial.println("FAILED");
+                  Serial.println("ERROR: Delete Test Failed.");
+              }
+          } else {
+              Serial.println("FAILED");
+              Serial.println("ERROR: Write Test Failed.");
+          }
+      }
+  
+      // Вывод итоговых результатов тестов
+      Serial.println("\n=== SPIFFS Diagnostics Summary ===");
+      Serial.printf("Initialization: %s\r\n", init_status ? "PASSED" : "FAILED");
+      Serial.printf("Memory Check: %s\r\n", skip_tests ? "SKIPPED" : (memory_status ? "PASSED" : "FAILED"));
+      Serial.printf("Filesystem Mount: %s\r\n", skip_tests ? "SKIPPED" : (mount_status ? "PASSED" : "FAILED"));
+      Serial.printf("Write Test: %s\r\n", skip_tests || !mount_status ? "SKIPPED" : (write_test_status ? "PASSED" : "FAILED"));
+      Serial.printf("Read Test: %s\r\n", skip_tests || !mount_status ? "SKIPPED" : (read_test_status ? "PASSED" : "FAILED"));
+      Serial.printf("Delete Test: %s\r\n", skip_tests || !mount_status ? "SKIPPED" : (delete_test_status ? "PASSED" : "FAILED"));
+  
+      Serial.println("=== SPIFFS Diagnostics Complete ===\n");
+  }
 };

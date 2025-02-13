@@ -1,6 +1,7 @@
 class Ls {
   private:
     const char* ls_commands[1] = {"help"};  // Обновленный массив команд
+    const char* ls_dependencies[1] = {"Help"}; // Список зависимостей
     Help help;
 
   public:
@@ -21,6 +22,8 @@ class Ls {
       if (command[1] == "help") {
         Serial.print("Available ls commands: ");
         help.print_help(ls_commands, sizeof(ls_commands) / sizeof(ls_commands[0]));
+        Serial.print("Dependencies: ");
+        help.print_help(ls_dependencies, sizeof(ls_dependencies) / sizeof(ls_dependencies[0]));
         return;
       } else {
         Serial.println("Unknown ls command");

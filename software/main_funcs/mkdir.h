@@ -1,6 +1,7 @@
 class Mkdir {
   private:
     const char* mkdir_commands[1] = {"help"};  // Обновленный массив команд
+    const char* mkdir_dependencies[1] = {"Help"}; // Список зависимостей
     Help help;
 
   public:
@@ -13,6 +14,8 @@ class Mkdir {
       if (command[1] == "help") {
         Serial.print("Available mkdir commands: ");
         help.print_help(mkdir_commands, sizeof(mkdir_commands) / sizeof(mkdir_commands[0]));
+        Serial.print("Dependencies: ");
+        help.print_help(mkdir_dependencies, sizeof(mkdir_dependencies) / sizeof(mkdir_dependencies[0]));
         return;
       }
 

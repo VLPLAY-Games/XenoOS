@@ -5,6 +5,7 @@ class Tar {
   private:
     Help help; // Экземпляр класса помощи
     const char* tar_commands[2] = {"extract", "help"}; // Доступные команды
+    const char* tar_dependencies[1] = {"Help"}; // Список зависимостей
 
     // Проверяет, существует ли директория, и создает её, если нужно
     bool ensure_directory(const char* directory) {
@@ -89,6 +90,9 @@ class Tar {
       if (command[1] == "help") {
         Serial.print("Available tar commands: ");
         help.print_help(tar_commands, sizeof(tar_commands) / sizeof(tar_commands[0]));
+        Serial.print("Dependencies: ");
+        help.print_help(tar_dependencies, sizeof(tar_dependencies) / sizeof(tar_dependencies[0]));
+        return;
       } else if (command[1] == "extract") {
         if (command.size() < 4) {
           Serial.println("Usage: tar extract <file> <extract_to>");

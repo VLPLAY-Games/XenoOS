@@ -515,45 +515,85 @@ class SdCard{
     // Функция диагностики
     void diagnostics() {
       Serial.println("=== Starting SD Card Diagnostics ===");
-
+  
+      bool init_status = false;
+      bool memory_status = false;
+      bool space_status = false;
+      bool filesystem_status = false;
+      bool write_test_status = false;
+      bool skip_tests = true; // Флаг для пропуска тестов, если SD-карта не инициализирована
+  
       // Проверка инициализации
+      Serial.print("Checking SD Card initialization... ");
       if (mount_sd()) {
-        Serial.println("SD Card is initialized");
+          Serial.println("OK");
+          init_status = true;
+          skip_tests = false; // Позволяем выполнять остальные тесты
       } else {
-        Serial.println("ERROR: SD Card is not initialized");
-        return; // Прекращаем диагностику, если карта не инициализирована
+          Serial.println("FAILED");
+          Serial.println("ERROR: SD Card is not initialized");
       }
-
-      // Проверка объёма памяти
-      Serial.printf("Total Space: %u KB\r\n", cardSize);
-      Serial.printf("Used Space: %u KB\r\n", cardUsage);
-      if (cardSize > 0 && cardUsage <= cardSize) {
-        Serial.println("SD Card memory check passed");
-      } else {
-        Serial.println("ERROR: Invalid memory values detected on SD Card.");
+  
+      // Проверка объёма памяти (если инициализация успешна)
+      if (!skip_tests) {
+          Serial.print("Checking SD Card memory... ");
+          Serial.printf("\n  Total Space: %u KB\r\n", cardSize);
+          Serial.printf("  Used Space: %u KB\r\n", cardUsage);
+          if (cardSize > 0 && cardUsage <= cardSize) {
+              memory_status = true;
+          } else {
+              Serial.println("FAILED");
+              Serial.println("ERROR: Invalid memory values detected on SD Card.");
+          }
       }
-      if (get_card_free() < 256) {
-        Serial.println("CRITICAL: Not enough free space on SD card. At least 256 KB required.");
+  
+      // Проверка свободного места (если инициализация успешна)
+      if (!skip_tests) {
+          Serial.print("Checking available space... ");
+          if (get_card_free() < 256) {
+              Serial.println("FAILED");
+              Serial.println("CRITICAL: Not enough free space on SD card. At least 256 KB required.");
+          } else {
+              Serial.println("OK");
+              space_status = true;
+          }
       }
-
-      // Проверка файловой системы
-      if (SD.exists("/")) {
-        Serial.println("Filesystem check passed");
-      } else {
-        Serial.println("ERROR: Filesystem not found or corrupted.");
+  
+      // Проверка файловой системы (если инициализация успешна)
+      if (!skip_tests) {
+          Serial.print("Checking filesystem... ");
+          if (SD.exists("/")) {
+              Serial.println("OK");
+              filesystem_status = true;
+          } else {
+              Serial.println("FAILED");
+              Serial.println("ERROR: Filesystem not found or corrupted.");
+          }
       }
-
-      // Проверка возможности записи с использованием writeFile
-      const char *test_file_path = "/test.txt";
-      const char *test_message = "SD Card Write Test";
-      writeFile(SD, test_file_path, test_message);
-      if (SD.exists(test_file_path)) {
-        SD.remove(test_file_path);
-        Serial.println("Write Test: Successful");
-      } else {
-        Serial.println("ERROR: Write Test Failed.");
+  
+      // Проверка возможности записи (если инициализация успешна)
+      if (!skip_tests) {
+          Serial.print("Testing write capability... ");
+          const char *test_file_path = "/test.txt";
+          const char *test_message = "SD Card Write Test";
+          writeFile(SD, test_file_path, test_message);
+          if (SD.exists(test_file_path)) {
+              SD.remove(test_file_path);
+              write_test_status = true;
+          } else {
+              Serial.println("FAILED");
+              Serial.println("ERROR: Write Test Failed.");
+          }
       }
-
-      Serial.println("=== SD Card Diagnostics Complete ===");
+  
+      // Вывод итоговых результатов тестов (всегда выполняется)
+      Serial.println("\n=== SD Card Diagnostics Summary ===");
+      Serial.printf("Initialization: %s\r\n", init_status ? "PASSED" : "FAILED");
+      Serial.printf("Memory Check: %s\r\n", skip_tests ? "SKIPPED" : (memory_status ? "PASSED" : "FAILED"));
+      Serial.printf("Available Space: %s\r\n", skip_tests ? "SKIPPED" : (space_status ? "PASSED" : "FAILED"));
+      Serial.printf("Filesystem Check: %s\r\n", skip_tests ? "SKIPPED" : (filesystem_status ? "PASSED" : "FAILED"));
+      Serial.printf("Write Test: %s\r\n", skip_tests ? "SKIPPED" : (write_test_status ? "PASSED" : "FAILED"));
+  
+      Serial.println("=== SD Card Diagnostics Complete ===\n");
     }
 };

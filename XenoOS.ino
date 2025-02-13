@@ -17,8 +17,8 @@
 #include "core/modules/diagnostics.h"
 
 #include "software/main_funcs/help.h"
-#include "software/serialconnection.h"
 #include "software/main_funcs/main_funcs.h"
+#include "software/serialconnection.h"
 #include "software/software.h"
 
 #include "boot/recovery.h"

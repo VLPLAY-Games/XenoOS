@@ -1,6 +1,7 @@
 class Hash {
   private:
     const char* hash_commands[1] = {"help"};  // Массив строк с командами
+    const char* hash_dependencies[1] = {"Help"}; // Список зависимостей
     Help help;
 
   public:
@@ -13,6 +14,8 @@ class Hash {
       if (command[1] == "help") {
         Serial.print("Available hash commands: ");
         help.print_help(hash_commands, sizeof(hash_commands) / sizeof(hash_commands[0]));
+        Serial.print("Dependencies: ");
+        help.print_help(hash_dependencies, sizeof(hash_dependencies) / sizeof(hash_dependencies[0]));
         return;
       }
 

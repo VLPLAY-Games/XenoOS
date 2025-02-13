@@ -1,6 +1,7 @@
 class Rm {
   private:
     const char* rm_commands[1] = {"help"};  // Обновленный массив команд
+    const char* rm_dependencies[1] = {"Help"}; // Список зависимостей
     Help help;
 
   public:
@@ -13,6 +14,8 @@ class Rm {
       if (command[1] == "help") {
         Serial.print("Available rm commands: ");
         help.print_help(rm_commands, sizeof(rm_commands) / sizeof(rm_commands[0]));
+        Serial.print("Dependencies: ");
+        help.print_help(rm_dependencies, sizeof(rm_dependencies) / sizeof(rm_dependencies[0]));
         return;
       }
 

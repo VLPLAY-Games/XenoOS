@@ -4,6 +4,7 @@ class DF {
     Spiffs spiffs;
     SdCard sd;
     const char* df_commands[2] = {"info", "help"}; // Массив строк с командами
+    const char* df_dependencies[1] = {"Help"}; // Список зависимостей
     Help help; // Экземпляр класса помощи
 
   public:
@@ -72,6 +73,9 @@ class DF {
         if (command[1] == "help") {
           Serial.print("Available df commands: ");
           help.print_help(df_commands, sizeof(df_commands) / sizeof(df_commands[0]));
+          Serial.print("Dependencies: ");
+          help.print_help(df_dependencies, sizeof(df_dependencies) / sizeof(df_dependencies[0]));
+          return;
         } else if (command[1] == "info") {
           print_memory_info();
         } else {
