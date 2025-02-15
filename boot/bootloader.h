@@ -2,6 +2,7 @@
 // Copyright (c) 2025 VL_PLAY (Vlad)
 // See LICENSE.md for details.
 
+#include "buildTime.h"
 
 class Bootloader {
   private:
@@ -164,6 +165,19 @@ class Bootloader {
       Serial.println("");
     }
 
+    void log_build_info() {
+      timer.println_with_timer("");
+      timer.println_with_timer("      Build Information");
+      timer.println_with_timer("===========================");
+      
+      // Выводим стандартную информацию о дате и времени сборки
+      timer.println_with_timer("Build Date: " + String(__DATE__));
+      timer.println_with_timer("Build Time: " + String(__TIME__));
+      
+      timer.println_with_timer("===========================");
+      timer.println_with_timer("");
+    }
+
   public:
     // Конструктор
     Bootloader(SdCard& sd_instance, Wifi& wifi_instance, Esp& esp_instance, Timer& timer_instance, Spiffs& spiffs_instance, Eeprom& eeprom_instance)
@@ -178,7 +192,7 @@ class Bootloader {
     // Основной метод загрузки
     void boot() {
       timer.println_with_timer("Starting Boot Process");
-
+      log_build_info();
       initialize_hardware();
       initialize_core();
       initialize_system();

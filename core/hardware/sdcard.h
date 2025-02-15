@@ -330,51 +330,106 @@ class SdCard{
       }
     }
 
-    // Перемещение файла
+    // Перемещение файла с проверкой размера
+    // Функция для копирования файла с возвращаемым значением успешности
+    bool copy_file(const char* source_path, const char* destination_path) {
+      Serial.printf("Copying file from %s to %s\r\n", source_path, destination_path);
+      
+      // Открываем исходный файл для чтения
+      File source = SD.open(source_path, FILE_READ);
+      if (!source) {
+          Serial.println("Failed to open source file for copying");
+          return false;  // Ошибка открытия исходного файла
+      }
+
+      // Получаем размер исходного файла
+      uint32_t totalSize = source.size();
+      uint32_t copiedSize = 0;
+      int barsPrinted = 0;
+      const int totalBars = 50;  // Количество символов прогресса
+      const int nextBarThreshold = totalSize / totalBars;
+
+      // Открываем файл назначения для записи
+      File destination = SD.open(destination_path, FILE_WRITE);
+      if (!destination) {
+          Serial.println("Failed to open destination file for copying");
+          source.close();
+          return false;  // Ошибка открытия целевого файла
+      }
+
+      Serial.print("Copying file: [");
+
+      // Копирование файла с отображением прогресса
+      while (source.available()) {
+          char buffer[128];  // Буфер для чтения данных (char вместо byte)
+          size_t size = source.readBytes(buffer, sizeof(buffer));
+          destination.write(reinterpret_cast<const uint8_t*>(buffer), size);  // Преобразуем buffer в uint8_t* перед записью
+          copiedSize += size;
+
+          // Проверяем, достигнут ли порог для добавления нового символа '#'
+          while (copiedSize >= (barsPrinted + 1) * nextBarThreshold && barsPrinted < totalBars) {
+              Serial.print("#");  // Печатаем новый символ '#'
+              barsPrinted++;
+          }
+      }
+
+      // Завершаем строку прогресса
+      while (barsPrinted < totalBars) {
+          Serial.print("#");
+          barsPrinted++;
+      }
+
+      Serial.println("]");
+
+      source.close();
+      destination.close();
+
+      // Проверка, что размер исходного и целевого файлов совпадает
+      File checkFile = SD.open(destination_path, FILE_READ);
+      if (!checkFile) {
+          Serial.println("Failed to open destination file for checking size");
+          return false;  // Ошибка открытия файла для проверки размера
+      }
+
+      uint32_t destinationSize = checkFile.size();
+      checkFile.close();
+
+      // Если размеры не совпадают, удаляем файл назначения и выводим ошибку
+      if (totalSize != destinationSize) {
+          Serial.println("Error: File sizes do not match.");
+          SD.remove(destination_path);  // Удаляем файл назначения
+          Serial.println("Destination file removed due to size mismatch.");
+          return false;  // Ошибка копирования из-за несоответствия размеров
+      }
+
+      Serial.printf("File copied successfully: %s to %s\r\n", source_path, destination_path);
+      return true;  // Успешное копирование
+    }
+
+    // Функция для перемещения файла с проверкой успешности копирования
     void move_file(const char* source_path, const char* destination_path) {
       Serial.printf("Moving file from %s to %s\r\n", source_path, destination_path);
 
       // Проверяем, существует ли исходный файл
       if (!SD.exists(source_path)) {
-        Serial.println("Source file does not exist");
-        return;
+          Serial.println("Source file does not exist");
+          return;
       }
 
       // Копируем файл в новую директорию
-      copy_file(source_path, destination_path);
+      bool copy_success = copy_file(source_path, destination_path);
+      if (!copy_success) {
+          Serial.println("File move failed due to copy error");
+          return;  // Прерываем выполнение, если копирование не удалось
+      }
 
       // Удаляем исходный файл после успешного копирования
       if (SD.remove(source_path)) {
-        Serial.println("File moved successfully");
+          Serial.println("File moved successfully");
       } else {
-        Serial.println("Failed to remove source file after copying");
+          Serial.println("Failed to remove source file after copying");
       }
     }
-
-    // Новая функция: Копирование файла
-    void copy_file(const char* source_path, const char* destination_path) {
-      File source = SD.open(source_path, FILE_READ);
-      if (!source) {
-        Serial.println("Failed to open source file for copying");
-        return;
-      }
-
-      File destination = SD.open(destination_path, FILE_WRITE);
-      if (!destination) {
-        Serial.println("Failed to open destination file for copying");
-        source.close();
-        return;
-      }
-
-      while (source.available()) {
-        destination.write(source.read());
-      }
-
-      Serial.printf("File copied from %s to %s\r\n", source_path, destination_path);
-      source.close();
-      destination.close();
-    }
-
     // Подсчет файлов в директории
     size_t count_files(const char* directory_path) {
       size_t file_count = 0;

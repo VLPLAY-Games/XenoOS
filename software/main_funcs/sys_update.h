@@ -84,7 +84,7 @@ class SystemUpdate {
 
       // Форматируем версии
       String formatted_current_version = String(current_version[0]) + "." + current_version[1] + "." + current_version[2];
-      Serial.printf("Current version: %s, Available version: %s\n", os_version, formatted_current_version.c_str());
+      Serial.printf("Current version: %s, Available version: %s\r\n", os_version, formatted_current_version.c_str());
 
       // Сравниваем версии как числа
       int current_version_int = current_version.toInt();  // Серверная версия

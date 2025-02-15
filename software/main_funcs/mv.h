@@ -25,9 +25,18 @@ class Mv {
         return;
       }
 
+      // Получаем нормализованные пути
       String source_path = sd.normalize_path(command[1]);
       String destination_path = sd.normalize_path(command[2]);
 
+      // Если в destination_path нет имени файла, добавляем имя из source_path
+      if (!destination_path.endsWith("/") && destination_path.indexOf('.') == -1) {
+        // Извлекаем имя файла из source_path
+        String file_name = source_path.substring(source_path.lastIndexOf("/") + 1);
+        destination_path += "/" + file_name;
+      }
+
+      // Перемещаем файл
       sd.move_file(source_path.c_str(), destination_path.c_str());
     }
 };
