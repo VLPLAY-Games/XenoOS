@@ -1,3 +1,9 @@
+// MIT License
+// Copyright (c) 2025 VL_PLAY (Vlad)
+// See LICENSE.md for details.
+
+
+
 class Cat {
   private:
     SdCard &sdcard;           // Ссылка на объект SdCard для взаимодействия с файловой системой

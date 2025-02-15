@@ -1,3 +1,9 @@
+// MIT License
+// Copyright (c) 2025 VL_PLAY (Vlad)
+// See LICENSE.md for details.
+
+
+
 #include <FS.h>
 #include <SD.h>
 #include <SPI.h>

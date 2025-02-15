@@ -1,3 +1,9 @@
+// MIT License
+// Copyright (c) 2025 VL_PLAY (Vlad)
+// See LICENSE.md for details.
+
+
+
 #include <SHA1Builder.h>
 #include <SD.h>
 

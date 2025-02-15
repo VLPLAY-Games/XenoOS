@@ -1,3 +1,9 @@
+// MIT License
+// Copyright (c) 2025 VL_PLAY (Vlad)
+// See LICENSE.md for details.
+
+
+
 class Mac {
   private:
     const char* mac_commands[2] = {"info", "help"}; // Массив строк с командами

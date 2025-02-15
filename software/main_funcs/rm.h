@@ -1,3 +1,9 @@
+// MIT License
+// Copyright (c) 2025 VL_PLAY (Vlad)
+// See LICENSE.md for details.
+
+
+
 class Rm {
   private:
     const char* rm_commands[1] = {"help"};  // Обновленный массив команд

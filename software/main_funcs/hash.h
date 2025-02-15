@@ -1,3 +1,9 @@
+// MIT License
+// Copyright (c) 2025 VL_PLAY (Vlad)
+// See LICENSE.md for details.
+
+
+
 class Hash {
   private:
     const char* hash_commands[1] = {"help"};  // Массив строк с командами

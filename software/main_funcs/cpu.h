@@ -1,3 +1,9 @@
+// MIT License
+// Copyright (c) 2025 VL_PLAY (Vlad)
+// See LICENSE.md for details.
+
+
+
 class Cpu {
   private:
     const char* cpu_commands[3] = {"info", "temp", "help"}; // Массив строк с командами

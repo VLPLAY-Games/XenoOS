@@ -1,3 +1,9 @@
+// MIT License
+// Copyright (c) 2025 VL_PLAY (Vlad)
+// See LICENSE.md for details.
+
+
+
 #include "software/config.h"
 #include "core/config.h"
 #include "boot/config.h"

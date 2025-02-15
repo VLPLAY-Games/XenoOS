@@ -1,3 +1,9 @@
+// MIT License
+// Copyright (c) 2025 VL_PLAY (Vlad)
+// See LICENSE.md for details.
+
+
+
 class Timer {
   private:
     uint32_t start_time;  // Время старта программы в миллисекундах

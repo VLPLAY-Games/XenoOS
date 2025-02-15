@@ -1,3 +1,8 @@
+// MIT License
+// Copyright (c) 2025 VL_PLAY (Vlad)
+// See LICENSE.md for details.
+
+
 class Bootloader {
   private:
     bool boot_success = false;

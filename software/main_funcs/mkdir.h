@@ -1,3 +1,9 @@
+// MIT License
+// Copyright (c) 2025 VL_PLAY (Vlad)
+// See LICENSE.md for details.
+
+
+
 class Mkdir {
   private:
     const char* mkdir_commands[1] = {"help"};  // Обновленный массив команд

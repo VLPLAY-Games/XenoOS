@@ -1,3 +1,9 @@
+// MIT License
+// Copyright (c) 2025 VL_PLAY (Vlad)
+// See LICENSE.md for details.
+
+
+
 const char* os_name = "XenoOS";
 
 const char* os_version = "0.1.9";

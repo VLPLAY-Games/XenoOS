@@ -1,3 +1,9 @@
+// MIT License
+// Copyright (c) 2025 VL_PLAY (Vlad)
+// See LICENSE.md for details.
+
+
+
 class Wifi_T{
     private:
         const char* wifi_commands[7] = {"connect", "disconnect", "reconnect", "scan", "status", "ip", "help"}; // Массив строк с командами

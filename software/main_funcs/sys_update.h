@@ -1,3 +1,9 @@
+// MIT License
+// Copyright (c) 2025 VL_PLAY (Vlad)
+// See LICENSE.md for details.
+
+
+
 class SystemUpdate {
   private:
     Wget &wget;                 // Ссылка на объект Wget для загрузки обновлений

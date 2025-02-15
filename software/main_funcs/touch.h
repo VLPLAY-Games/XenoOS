@@ -1,3 +1,9 @@
+// MIT License
+// Copyright (c) 2025 VL_PLAY (Vlad)
+// See LICENSE.md for details.
+
+
+
 class Touch {
   private:
     const char* touch_commands[1] = {"help"};  // Обновленный массив команд
