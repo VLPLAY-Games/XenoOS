@@ -7,6 +7,7 @@
 class Timer {
   private:
     uint32_t start_time;  // Время старта программы в миллисекундах
+    ColorPrinter color;
 
   public:
     // Конструктор, который инициализирует время старта
@@ -33,19 +34,36 @@ class Timer {
 
     // Метод для печати времени на экран в формате [0.000]
     void print_time() {
-      Serial.print("[");
-      Serial.print(get_sec(), 3);  // Печатаем время с точностью до 3 знаков после запятой
-      Serial.print("] ");
+      color.print_log("[");
+      color.print_log(get_sec());  // Печатаем время с точностью до 3 знаков после запятой
+      color.print_log("] ");
     }
 
-    // Утилита для вывода лога с таймером
-    void println_with_timer(const String& message) {
+    // Утилита для вывода лога с таймером и цветной обработкой
+    void println_with_timer(const String& message, const String& type = "text") {
       print_time();
-      Serial.println(message);
+      print_colored(message, type, true);
     }
 
-    void print_with_timer(const String& message) {
+    void print_with_timer(const String& message, const String& type = "text") {
       print_time();
-      Serial.print(message);
+      print_colored(message, type, false);
+    }
+
+    // Функция для цветного вывода через ColorPrinter
+    void print_colored(const String& message, const String& type, bool newLine) {
+      if (type == "error") {
+          newLine ? color.print_error(message, true) : color.print_error(message, false);
+      } else if (type == "warning") {
+          newLine ? color.print_warning(message, true) : color.print_warning(message, false);
+      } else if (type == "success") {
+          newLine ? color.print_success(message, true) : color.print_success(message, false);
+      } else if (type == "info") {
+          newLine ? color.print_info(message, true) : color.print_info(message, false);
+      } else if (type == "log") {
+          newLine ? color.print_log(message, true) : color.print_log(message, false);
+      } else {
+        newLine ? Serial.println(message) : Serial.print(message);
+      }
     }
 };

@@ -16,12 +16,15 @@ extern uint64_t cardUsage = 0;
 extern uint64_t cardFree = 0;
 
 class SdCard{ 
+  private:
+    ColorPrinter color;
+
   public:
     bool mount_sd(Timer* timer = nullptr, bool print = false) {
       if (!SD.begin()) {
         if (print){
           if (timer) {
-            timer->println_with_timer("Card Mount Failed");
+            timer->println_with_timer("Card Mount Failed", "error");
           } else {
             Serial.println("Card Mount Failed");
           }
@@ -34,7 +37,7 @@ class SdCard{
       if (cardType == CARD_NONE) {
         if (print){
           if (timer) {
-            timer->println_with_timer("No SD card attached");
+            timer->println_with_timer("No SD card attached", "error");
           } else {
             Serial.println("No SD card attached");
           }
@@ -44,7 +47,7 @@ class SdCard{
 
       if (print){
         if (timer) {
-          timer->println_with_timer("SD Card Mounted successfully");
+          timer->println_with_timer("SD Card Mounted successfully", "success");
         } else {
           Serial.println("SD Card Mounted successfully");
         }
@@ -110,12 +113,12 @@ class SdCard{
         timer.println_with_timer("===========================");
         timer.println_with_timer("");
         current_directory = "/";
-        timer.println_with_timer("Changed current directory to /");
-        timer.println_with_timer("SD Card Loaded");
+        timer.println_with_timer("Changed current directory to /", "info");
+        timer.println_with_timer("SD Card Loaded", "success");
         return true;
       }
       else {
-        timer.println_with_timer("SD Card Not Loaded");
+        timer.println_with_timer("SD Card Not Loaded", "error");
         return false;
       }
     }
@@ -575,86 +578,100 @@ class SdCard{
 
     // Функция диагностики
     void diagnostics() {
-      Serial.println("=== Starting SD Card Diagnostics ===");
-  
+      color.print_log("=== Starting SD Card Diagnostics ===", true);
+
       bool init_status = false;
       bool memory_status = false;
       bool space_status = false;
       bool filesystem_status = false;
       bool write_test_status = false;
       bool skip_tests = true; // Флаг для пропуска тестов, если SD-карта не инициализирована
-  
+
       // Проверка инициализации
-      Serial.print("Checking SD Card initialization... ");
+      color.print_info("Checking SD Card initialization... ", false);
       if (mount_sd()) {
-          Serial.println("OK");
+          color.print_success("PASSED", true);
           init_status = true;
-          skip_tests = false; // Позволяем выполнять остальные тесты
+          skip_tests = false;
       } else {
-          Serial.println("FAILED");
-          Serial.println("ERROR: SD Card is not initialized");
+          color.print_error("FAILED", true);
+          color.print_error("ERROR: SD Card is not initialized", true);
       }
-  
-      // Проверка объёма памяти (если инициализация успешна)
+
+      // Проверка объёма памяти
       if (!skip_tests) {
-          Serial.print("Checking SD Card memory... ");
-          Serial.printf("\n  Total Space: %u KB\r\n", cardSize);
-          Serial.printf("  Used Space: %u KB\r\n", cardUsage);
+          color.print_info("Checking SD Card memory...", true);
+          color.print_log("  Total Space: " + String(cardSize) + " KB", true);
+          color.print_log("  Used Space: " + String(cardUsage) + " KB", true);
+
           if (cardSize > 0 && cardUsage <= cardSize) {
               memory_status = true;
           } else {
-              Serial.println("FAILED");
-              Serial.println("ERROR: Invalid memory values detected on SD Card.");
+              color.print_error("FAILED", true);
+              color.print_error("ERROR: Invalid memory values detected on SD Card.", true);
           }
       }
-  
-      // Проверка свободного места (если инициализация успешна)
+
+      // Проверка свободного места
       if (!skip_tests) {
-          Serial.print("Checking available space... ");
+          color.print_info("Checking available space... ", false);
           if (get_card_free() < 256) {
-              Serial.println("FAILED");
-              Serial.println("CRITICAL: Not enough free space on SD card. At least 256 KB required.");
+              color.print_error("FAILED", true);
+              color.print_error("CRITICAL: Not enough free space on SD card. At least 256 KB required.", true);
           } else {
-              Serial.println("OK");
+              color.print_success("PASSED", true);
               space_status = true;
           }
       }
-  
-      // Проверка файловой системы (если инициализация успешна)
+
+      // Проверка файловой системы
       if (!skip_tests) {
-          Serial.print("Checking filesystem... ");
+          color.print_info("Checking filesystem... ", false);
           if (SD.exists("/")) {
-              Serial.println("OK");
+              color.print_success("PASSED", true);
               filesystem_status = true;
           } else {
-              Serial.println("FAILED");
-              Serial.println("ERROR: Filesystem not found or corrupted.");
+              color.print_error("FAILED", true);
+              color.print_error("ERROR: Filesystem not found or corrupted.", true);
           }
       }
-  
-      // Проверка возможности записи (если инициализация успешна)
+
+      // Проверка возможности записи
       if (!skip_tests) {
-          Serial.print("Testing write capability... ");
+          color.print_info("Testing write capability... ", false);
           const char *test_file_path = "/test.txt";
           const char *test_message = "SD Card Write Test";
           writeFile(SD, test_file_path, test_message);
+
           if (SD.exists(test_file_path)) {
               SD.remove(test_file_path);
+              color.print_success("PASSED", true);
               write_test_status = true;
           } else {
-              Serial.println("FAILED");
-              Serial.println("ERROR: Write Test Failed.");
+              color.print_error("FAILED", true);
+              color.print_error("ERROR: Write Test Failed.", true);
           }
       }
-  
-      // Вывод итоговых результатов тестов (всегда выполняется)
-      Serial.println("\n=== SD Card Diagnostics Summary ===");
-      Serial.printf("Initialization: %s\r\n", init_status ? "PASSED" : "FAILED");
-      Serial.printf("Memory Check: %s\r\n", skip_tests ? "SKIPPED" : (memory_status ? "PASSED" : "FAILED"));
-      Serial.printf("Available Space: %s\r\n", skip_tests ? "SKIPPED" : (space_status ? "PASSED" : "FAILED"));
-      Serial.printf("Filesystem Check: %s\r\n", skip_tests ? "SKIPPED" : (filesystem_status ? "PASSED" : "FAILED"));
-      Serial.printf("Write Test: %s\r\n", skip_tests ? "SKIPPED" : (write_test_status ? "PASSED" : "FAILED"));
-  
-      Serial.println("=== SD Card Diagnostics Complete ===\n");
-    }
+
+      // Вывод итоговых результатов тестов
+      color.print_log("\n=== SD Card Diagnostics Summary ===", true);
+      
+      color.print_info("Initialization: ", false);
+      init_status ? color.print_success("PASSED", true) : color.print_error("FAILED", true);
+
+      color.print_info("Memory Check: ", false);
+      skip_tests ? color.print_warning("SKIPPED", true) : (memory_status ? color.print_success("PASSED", true) : color.print_error("FAILED", true));
+
+      color.print_info("Available Space: ", false);
+      skip_tests ? color.print_warning("SKIPPED", true) : (space_status ? color.print_success("PASSED", true) : color.print_error("FAILED", true));
+
+      color.print_info("Filesystem Check: ", false);
+      skip_tests ? color.print_warning("SKIPPED", true) : (filesystem_status ? color.print_success("PASSED", true) : color.print_error("FAILED", true));
+
+      color.print_info("Write Test: ", false);
+      skip_tests ? color.print_warning("SKIPPED", true) : (write_test_status ? color.print_success("PASSED", true) : color.print_error("FAILED", true));
+
+      color.print_log("=== SD Card Diagnostics Complete ===", true);
+      color.print_info("SD Card Diagnostics finished.", true);
+  }
 };

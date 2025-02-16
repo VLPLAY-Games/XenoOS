@@ -8,6 +8,7 @@
 #include "core/config.h"
 #include "boot/config.h"
 
+#include "core/modules/terminal_colors.h"
 #include "core/modules/timer.h"
 #include "core/modules/wifi.h"
 
@@ -35,7 +36,7 @@ Timer timer;
 Spiffs spiffs;
 SdCard sd;
 Wifi wifi;
-Esp esp;
+Esp esp(timer);
 Eeprom eeprom;
 System sys;
 
