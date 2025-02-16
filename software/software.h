@@ -1,6 +1,6 @@
 // MIT License
 // Copyright (c) 2025 VL_PLAY (Vlad)
-// See LICENSE.md for details.
+// See https://github.com/VLPLAY-Games/XenoOS/blob/main/LICENSE for details.
 
 
 
@@ -114,7 +114,7 @@ class System {
         else if (sc.get_input() == "update") funcs.update();
         else if (sc.get_input() == "clear") funcs.clear();
         else if (sc.get_input() == "help") funcs.help_commands();
-        else Serial.println("Unknown command");
+        else Serial.println(sc.get_input() + ": Unknown command");
         
         history.write_history((sc.get_input() + "\n").c_str(), sd);
 

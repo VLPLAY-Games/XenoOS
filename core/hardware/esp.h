@@ -1,6 +1,6 @@
 // MIT License
 // Copyright (c) 2025 VL_PLAY (Vlad)
-// See LICENSE.md for details.
+// See https://github.com/VLPLAY-Games/XenoOS/blob/main/LICENSE for details.
 
 
 
@@ -42,6 +42,9 @@ class Esp {
     uint32_t cpu_frequency_mhz;
     uint8_t chip_core_count;
 
+    uint32_t expected_ram_min = 0;
+    uint32_t expected_ram_max  = 0;
+
     Timer& timer;
     ColorPrinter color;
 
@@ -66,6 +69,32 @@ class Esp {
       chip_unique_id = calculate_chip_id();
       cpu_frequency_mhz = ESP.getCpuFreqMHz();
       chip_core_count = ESP.getChipCores();
+      // Определяем тип устройства и минимально ожидаемый объем RAM
+      #if CONFIG_IDF_TARGET_ESP32
+        // Для стандартных ESP32
+        expected_ram_min = 320;  // Минимальный объем RAM для стандартного ESP32 (320KB для программы)
+        expected_ram_max = 512;  // Максимальный объем RAM для стандартного ESP32 (512KB)
+
+      #elif CONFIG_IDF_TARGET_ESP32S2
+        // Для ESP32-S2
+        expected_ram_min = 320;  // Минимальный объем RAM для ESP32-S2 (320KB для программы)
+        expected_ram_max = 320;  // Максимальный объем RAM для ESP32-S2 (320KB)
+
+      #elif CONFIG_IDF_TARGET_ESP32C3
+        // Для ESP32-C3
+        expected_ram_min = 240;  // Минимальный объем RAM для ESP32-C3 (240KB для программы)
+        expected_ram_max = 290;  // Максимальный объем RAM для ESP32-C3 (290KB)
+
+      #elif CONFIG_IDF_TARGET_ESP32S3
+        // Для ESP32-S3
+        expected_ram_min = 320;  // Минимальный объем RAM для ESP32-S3 (320KB для программы)
+        expected_ram_max = 512;  // Максимальный объем RAM для ESP32-S3 (512KB)
+
+      #else
+        // Если тип устройства не поддерживается, выставляем по умолчанию 512KB
+        expected_ram_min = 512;  // Стандартный минимальный размер для других устройств
+        expected_ram_max = 512;  // Стандартный максимальный размер для других устройств
+      #endif
     }
 
     // Методы для получения и обновления значений
@@ -290,7 +319,7 @@ class Esp {
     }
 
     // Функция диагностики
-    void diagnostics() {
+    bool diagnostics() {
       color.print_log("=== Starting ESP32 Diagnostics ===", true);
   
       bool chip_model_status = false;
@@ -300,7 +329,7 @@ class Esp {
       bool ram_status = false;
   
       // Проверка модели чипа
-      color.print_info("Checking chip model... ", false);
+      color.print_info("Checking chip model... ");
       String model = chip_model();
       if (model.indexOf("ESP32") != -1) { 
           color.print_success("PASSED", true);
@@ -311,7 +340,7 @@ class Esp {
       }
   
       // Проверка частоты процессора
-      color.print_info("Checking CPU frequency... ", false);
+      color.print_info("Checking CPU frequency... ");
       uint32_t freq = cpu_freq();
       if (freq >= 80 && freq <= 240) {
           color.print_success("PASSED", true);
@@ -322,7 +351,7 @@ class Esp {
       }
   
       // Проверка числа ядер
-      color.print_info("Checking number of CPU cores... ", false);
+      color.print_info("Checking number of CPU cores... ");
       uint8_t cores = chip_cores();
       if (cores == 1 || cores == 2) {
           color.print_success("PASSED", true);
@@ -333,7 +362,7 @@ class Esp {
       }
   
       // Проверка общей памяти программ
-      color.print_info("Checking program memory size... ", false);
+      color.print_info("Checking program memory size... ");
       uint32_t prog_mem = total_program_memory();
       if (prog_mem >= 4000) {
           color.print_success("PASSED", true);
@@ -344,9 +373,9 @@ class Esp {
       }
   
       // Проверка RAM
-      color.print_info("Checking RAM size... ", false);
+      color.print_info("Checking RAM size... ");
       uint32_t ram = total_ram();
-      if (ram >= 512) {
+      if (ram >= expected_ram_min && ram <= expected_ram_max) {
           color.print_success("PASSED", true);
           ram_status = true;
       } else {
@@ -357,22 +386,28 @@ class Esp {
       // Вывод итоговых результатов тестов
       color.print_log("\n=== ESP32 Diagnostics Summary ===", true);
       
-      color.print_info("Chip Model: ", false);
+      color.print_info("Chip Model: ");
       chip_model_status ? color.print_success("PASSED", true) : color.print_error("FAILED", true);
   
-      color.print_info("CPU Frequency: ", false);
+      color.print_info("CPU Frequency: ");
       cpu_freq_status ? color.print_success("PASSED", true) : color.print_error("FAILED", true);
   
-      color.print_info("CPU Cores: ", false);
+      color.print_info("CPU Cores: ");
       cpu_cores_status ? color.print_success("PASSED", true) : color.print_warning("WARNING", true);
   
-      color.print_info("Program Memory: ", false);
+      color.print_info("Program Memory: ");
       prog_mem_status ? color.print_success("PASSED", true) : color.print_error("FAILED", true);
   
-      color.print_info("RAM Size: ", false);
+      color.print_info("RAM Size: ");
       ram_status ? color.print_success("PASSED", true) : color.print_error("FAILED", true);
   
       color.print_log("=== ESP32 Diagnostics Complete ===", true);
       color.print_info("ESP32 Diagnostics finished.", true);
+
+      if (chip_model_status && cpu_freq_status && cpu_cores_status && prog_mem_status && ram_status) {
+        return true;
+      } else {
+        return false;
+      }
     }
 };

@@ -1,6 +1,6 @@
 // MIT License
 // Copyright (c) 2025 VL_PLAY (Vlad)
-// See LICENSE.md for details.
+// See https://github.com/VLPLAY-Games/XenoOS/blob/main/LICENSE for details.
 
 
 
@@ -577,7 +577,7 @@ class SdCard{
 
 
     // Функция диагностики
-    void diagnostics() {
+    bool diagnostics() {
       color.print_log("=== Starting SD Card Diagnostics ===", true);
 
       bool init_status = false;
@@ -588,7 +588,7 @@ class SdCard{
       bool skip_tests = true; // Флаг для пропуска тестов, если SD-карта не инициализирована
 
       // Проверка инициализации
-      color.print_info("Checking SD Card initialization... ", false);
+      color.print_info("Checking SD Card initialization... ");
       if (mount_sd()) {
           color.print_success("PASSED", true);
           init_status = true;
@@ -614,7 +614,7 @@ class SdCard{
 
       // Проверка свободного места
       if (!skip_tests) {
-          color.print_info("Checking available space... ", false);
+          color.print_info("Checking available space... ");
           if (get_card_free() < 256) {
               color.print_error("FAILED", true);
               color.print_error("CRITICAL: Not enough free space on SD card. At least 256 KB required.", true);
@@ -626,7 +626,7 @@ class SdCard{
 
       // Проверка файловой системы
       if (!skip_tests) {
-          color.print_info("Checking filesystem... ", false);
+          color.print_info("Checking filesystem... ");
           if (SD.exists("/")) {
               color.print_success("PASSED", true);
               filesystem_status = true;
@@ -638,7 +638,7 @@ class SdCard{
 
       // Проверка возможности записи
       if (!skip_tests) {
-          color.print_info("Testing write capability... ", false);
+          color.print_info("Testing write capability... ");
           const char *test_file_path = "/test.txt";
           const char *test_message = "SD Card Write Test";
           writeFile(SD, test_file_path, test_message);
@@ -656,22 +656,28 @@ class SdCard{
       // Вывод итоговых результатов тестов
       color.print_log("\n=== SD Card Diagnostics Summary ===", true);
       
-      color.print_info("Initialization: ", false);
+      color.print_info("Initialization: ");
       init_status ? color.print_success("PASSED", true) : color.print_error("FAILED", true);
 
-      color.print_info("Memory Check: ", false);
+      color.print_info("Memory Check: ");
       skip_tests ? color.print_warning("SKIPPED", true) : (memory_status ? color.print_success("PASSED", true) : color.print_error("FAILED", true));
 
-      color.print_info("Available Space: ", false);
+      color.print_info("Available Space: ");
       skip_tests ? color.print_warning("SKIPPED", true) : (space_status ? color.print_success("PASSED", true) : color.print_error("FAILED", true));
 
-      color.print_info("Filesystem Check: ", false);
+      color.print_info("Filesystem Check: ");
       skip_tests ? color.print_warning("SKIPPED", true) : (filesystem_status ? color.print_success("PASSED", true) : color.print_error("FAILED", true));
 
-      color.print_info("Write Test: ", false);
+      color.print_info("Write Test: ");
       skip_tests ? color.print_warning("SKIPPED", true) : (write_test_status ? color.print_success("PASSED", true) : color.print_error("FAILED", true));
 
       color.print_log("=== SD Card Diagnostics Complete ===", true);
       color.print_info("SD Card Diagnostics finished.", true);
+
+      if (init_status && memory_status && space_status && filesystem_status && write_test_status) {
+        return true;
+      } else {
+        return false;
+      }
   }
 };

@@ -1,18 +1,19 @@
 // MIT License
 // Copyright (c) 2025 VL_PLAY (Vlad)
-// See LICENSE.md for details.
+// See https://github.com/VLPLAY-Games/XenoOS/blob/main/LICENSE for details.
 
 
 
 #include <EEPROM.h>
+
+extern bool eeprom_init = false;
 
 class Eeprom {
   private:
     const uint8_t eeprom_size = 18;  // Размер EEPROM памяти в байтах (18 байт)
     const uint8_t diagnostic_index = 17;  // Индекс для хранения диагностической информации
     const uint8_t diagnostic_value = 200;
-    bool eeprom_init = false;
-
+    
     ColorPrinter color;
 
   public:
@@ -52,7 +53,6 @@ class Eeprom {
     uint8_t read_diagnostic_info() {
       uint8_t diagnostic_data = EEPROM.read(diagnostic_index);
       Serial.printf("Diagnostic Info (EEPROM[%d]): %d\r\n", diagnostic_index, diagnostic_data);
-      Serial.println("Read Test: Successful");
       return diagnostic_data;
     }
 
@@ -61,7 +61,6 @@ class Eeprom {
       EEPROM.write(diagnostic_index, data);
       EEPROM.commit();  // Сохраняем изменения
       Serial.printf("Written %d to EEPROM diagnostic index\r\n", data);
-      Serial.println("Write Test: Successful");
     }
 
     void print_info(Timer* timer = nullptr){
@@ -73,12 +72,11 @@ class Eeprom {
     }
 
     // Функция диагностики
-    void diagnostics() {
+    bool diagnostics() {
       color.print_log("=== Starting EEPROM Diagnostics ===", true);
   
       bool init_status = false;
       bool write_test_status = false;
-      bool read_test_status = false;
       bool clear_test_status = false;
       bool skip_tests = true;  // Флаг для пропуска тестов, если EEPROM не инициализирована
   
@@ -141,12 +139,15 @@ class Eeprom {
       color.print_info("Write Test: ");
       skip_tests ? color.print_warning("SKIPPED", true) : (write_test_status ? color.print_success("PASSED", true) : color.print_error("FAILED", true));
   
-      color.print_info("Read Test: ");
-      skip_tests ? color.print_warning("SKIPPED", true) : (read_test_status ? color.print_success("PASSED", true) : color.print_error("FAILED", true));
-  
       color.print_info("Clear Test: ");
       skip_tests ? color.print_warning("SKIPPED", true) : (clear_test_status ? color.print_success("PASSED", true) : color.print_error("FAILED", true));
   
       color.print_log("=== EEPROM Diagnostics Complete ===\n", true);
+
+      if (init_status && write_test_status && clear_test_status) {
+        return true;
+      } else {
+        return false;
+      }
     }
 };

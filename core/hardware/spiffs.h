@@ -1,6 +1,6 @@
 // MIT License
 // Copyright (c) 2025 VL_PLAY (Vlad)
-// See LICENSE.md for details.
+// See https://github.com/VLPLAY-Games/XenoOS/blob/main/LICENSE for details.
 
 
 
@@ -206,7 +206,7 @@ class Spiffs {
     }
 
     // Функция диагностики SPIFFS
-    void diagnostics() {
+    bool diagnostics() {
       color.print_log("=== Starting SPIFFS Diagnostics ===", true);
 
       bool init_status = false;
@@ -218,7 +218,7 @@ class Spiffs {
       bool skip_tests = true; // Флаг для пропуска тестов, если SPIFFS не инициализирован
 
       // Проверка инициализации
-      color.print_info("Checking SPIFFS initialization... ", false);
+      color.print_info("Checking SPIFFS initialization... ");
       if (SPIFFS.begin(true)) {
           color.print_success("PASSED", true);
           init_status = true;
@@ -246,7 +246,7 @@ class Spiffs {
 
       // Проверка файловой системы
       if (!skip_tests) {
-          color.print_info("Checking filesystem mount... ", false);
+          color.print_info("Checking filesystem mount... ");
           if (isMounted()) {
               color.print_success("PASSED", true);
               mount_status = true;
@@ -263,13 +263,13 @@ class Spiffs {
           const char* testMessage = "SPIFFS Diagnostics Test Message";
 
           // Тест записи
-          color.print_info("Testing write operation... ", false);
+          color.print_info("Testing write operation... ");
           if (writeFile(testFilePath, testMessage)) {
               color.print_success("PASSED", true);
               write_test_status = true;
 
               // Тест чтения
-              color.print_info("Testing read operation... ", false);
+              color.print_info("Testing read operation... ");
               String content = readFile(testFilePath);
               if (content == testMessage) {
                   color.print_success("PASSED", true);
@@ -280,7 +280,7 @@ class Spiffs {
               }
 
               // Удаление тестового файла
-              color.print_info("Testing file deletion... ", false);
+              color.print_info("Testing file deletion... ");
               if (deleteFile(testFilePath)) {
                   color.print_success("PASSED", true);
                   delete_test_status = true;
@@ -297,25 +297,31 @@ class Spiffs {
       // Вывод итоговых результатов тестов
       color.print_log("\n=== SPIFFS Diagnostics Summary ===", true);
 
-      color.print_info("Initialization: ", false);
+      color.print_info("Initialization: ");
       init_status ? color.print_success("PASSED", true) : color.print_error("FAILED", true);
 
-      color.print_info("Memory Check: ", false);
+      color.print_info("Memory Check: ");
       skip_tests ? color.print_warning("SKIPPED", true) : (memory_status ? color.print_success("PASSED", true) : color.print_error("FAILED", true));
 
-      color.print_info("Filesystem Mount: ", false);
+      color.print_info("Filesystem Mount: ");
       skip_tests ? color.print_warning("SKIPPED", true) : (mount_status ? color.print_success("PASSED", true) : color.print_error("FAILED", true));
 
-      color.print_info("Write Test: ", false);
+      color.print_info("Write Test: ");
       skip_tests || !mount_status ? color.print_warning("SKIPPED", true) : (write_test_status ? color.print_success("PASSED", true) : color.print_error("FAILED", true));
 
-      color.print_info("Read Test: ", false);
+      color.print_info("Read Test: ");
       skip_tests || !mount_status ? color.print_warning("SKIPPED", true) : (read_test_status ? color.print_success("PASSED", true) : color.print_error("FAILED", true));
 
-      color.print_info("Delete Test: ", false);
+      color.print_info("Delete Test: ");
       skip_tests || !mount_status ? color.print_warning("SKIPPED", true) : (delete_test_status ? color.print_success("PASSED", true) : color.print_error("FAILED", true));
 
       color.print_log("=== SPIFFS Diagnostics Complete ===", true);
       color.print_info("SPIFFS Diagnostics finished.", true);
+
+      if (init_status && memory_status && mount_status && write_test_status && read_test_status && delete_test_status) {
+        return true;
+      } else {
+        return false;
+      }
   }
 };
