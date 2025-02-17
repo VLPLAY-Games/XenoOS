@@ -96,7 +96,7 @@ After completing these steps, the system should be running on your device.
 
 ## Usage
 
-Once installed, you can interact with the system by typing commands directly into the terminal or console. Refer to the "Command List" above for all available commands and their usage examples.
+Once installed, you can interact with the system via Serial port (Speed 115200) in Putty (or Arduino IDE Serial terminal (not recommended))by typing commands directly into the terminal or console. Refer to the "Command List" above for all available commands and their usage examples.
 
 ## Diagnostics
 
