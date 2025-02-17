@@ -54,7 +54,7 @@ To install and set up the system, follow these steps:
 
 1. **Prerequisites**:
     - You must have **Arduino IDE 2.x** installed.
-    - Ensure the **ESP32 core version 3.0.0 or later** is installed in Arduino IDE.
+    - Ensure the **ESP32 core version 3.1.0 or later** is installed in Arduino IDE.
     - You will also need the following libraries installed:
       - `buildTime` version 1.0.0
       - `ESPping` version 1.0.5
