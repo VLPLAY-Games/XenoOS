@@ -1,6 +1,8 @@
 
 # XenoOS v0.2.0
 
+[Read in Russian](README_RU.md)
+
 ## Overview
 
 This is a command-line interface (CLI) system for interacting with various system components such as filesystems, Wi-Fi, SD cards, and system diagnostics. The system supports a variety of commands for managing files, directories, and system configurations.
