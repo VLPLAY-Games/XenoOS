@@ -11,7 +11,7 @@ class SerialConnection {
     String input;
     History history;
     std::vector<String> command;
-    String current_directory = "/";  // Пример начальной директории для подсказки
+    String current_directory = "/";
     int command_history_index = -1;
 
   public:
@@ -35,7 +35,7 @@ class SerialConnection {
           } 
           // Обработка последовательностей для стрелок
           else if (c == 0x1B) {  // Начало escape-последовательности
-              delay(10);  // Ждем, чтобы получить следующий символ
+              delay(10);
               if (Serial.available()) {
                   char nextChar = Serial.read();
                   if (nextChar == 0x5B) {  // Код для '['

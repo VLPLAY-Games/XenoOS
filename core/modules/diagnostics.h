@@ -66,9 +66,9 @@ class Diagnostics {
             Serial.println();
             // Итоговый результат диагностики
             if (esp_diagnostic && spiffs_diagnostic && sd_diagnostic && eeprom_diagnostic) {
-                color.print_success("Diagnostic: PASSED", true);  // Все прошли успешно
+                color.print_success("Diagnostic: PASSED", true);
             } else {
-                color.print_error("Diagnostic: FAILED", true);  // Есть ошибки
+                color.print_error("Diagnostic: FAILED", true);
             }
 
             Serial.println();

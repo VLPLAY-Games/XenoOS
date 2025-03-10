@@ -18,7 +18,7 @@ class Eeprom {
 
   public:
     bool init() {
-        eeprom_init = EEPROM.begin(eeprom_size); // Инициализация EEPROM с заданным размером
+        eeprom_init = EEPROM.begin(eeprom_size);
         return eeprom_init;
     }
 
@@ -45,7 +45,7 @@ class Eeprom {
         }
 
         EEPROM.write(index, data);
-        EEPROM.commit();  // Не забываем сохранить изменения
+        EEPROM.commit();
         Serial.printf("Written %d to EEPROM[%d]\r\n", data, index);
     }
 
@@ -59,7 +59,7 @@ class Eeprom {
     // Функция для записи диагностической информации
     void write_diagnostic_info(byte data) {
       EEPROM.write(diagnostic_index, data);
-      EEPROM.commit();  // Сохраняем изменения
+      EEPROM.commit();
       Serial.printf("Written %d to EEPROM diagnostic index\r\n", data);
     }
 

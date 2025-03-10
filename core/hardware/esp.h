@@ -69,78 +69,79 @@ class Esp {
       chip_unique_id = calculate_chip_id();
       cpu_frequency_mhz = ESP.getCpuFreqMHz();
       chip_core_count = ESP.getChipCores();
+
       // Определяем тип устройства и минимально ожидаемый объем RAM
       #if CONFIG_IDF_TARGET_ESP32
         // Для стандартных ESP32
-        expected_ram_min = 320;  // Минимальный объем RAM для стандартного ESP32 (320KB для программы)
-        expected_ram_max = 512;  // Максимальный объем RAM для стандартного ESP32 (512KB)
+        expected_ram_min = 320;
+        expected_ram_max = 512;
 
       #elif CONFIG_IDF_TARGET_ESP32S2
         // Для ESP32-S2
-        expected_ram_min = 320;  // Минимальный объем RAM для ESP32-S2 (320KB для программы)
-        expected_ram_max = 320;  // Максимальный объем RAM для ESP32-S2 (320KB)
+        expected_ram_min = 320;
+        expected_ram_max = 320;
 
       #elif CONFIG_IDF_TARGET_ESP32C3
         // Для ESP32-C3
-        expected_ram_min = 240;  // Минимальный объем RAM для ESP32-C3 (240KB для программы)
-        expected_ram_max = 290;  // Максимальный объем RAM для ESP32-C3 (290KB)
+        expected_ram_min = 240;
+        expected_ram_max = 290;
 
       #elif CONFIG_IDF_TARGET_ESP32S3
         // Для ESP32-S3
-        expected_ram_min = 320;  // Минимальный объем RAM для ESP32-S3 (320KB для программы)
-        expected_ram_max = 512;  // Максимальный объем RAM для ESP32-S3 (512KB)
+        expected_ram_min = 320;
+        expected_ram_max = 512;
 
       #else
         // Если тип устройства не поддерживается, выставляем по умолчанию 512KB
-        expected_ram_min = 512;  // Стандартный минимальный размер для других устройств
-        expected_ram_max = 512;  // Стандартный максимальный размер для других устройств
+        expected_ram_min = 512;
+        expected_ram_max = 512;
       #endif
     }
 
     // Методы для получения и обновления значений
     uint32_t free_ram() {
-      free_ram_kb = ESP.getFreeHeap() / 1024; // Обновляем переменную
-      return free_ram_kb; // Возвращаем значение
+      free_ram_kb = ESP.getFreeHeap() / 1024;
+      return free_ram_kb;
     }
 
     uint32_t total_ram() {
-      total_ram_kb = ESP.getHeapSize() / 1024; // Обновляем переменную
-      return total_ram_kb; // Возвращаем значение
+      total_ram_kb = ESP.getHeapSize() / 1024;
+      return total_ram_kb;
     }
 
     uint32_t used_ram() {
-      used_ram_kb = (ESP.getHeapSize() - ESP.getFreeHeap()) / 1024; // Обновляем переменную
-      return used_ram_kb; // Возвращаем значение
+      used_ram_kb = (ESP.getHeapSize() - ESP.getFreeHeap()) / 1024;
+      return used_ram_kb;
     }
 
     uint32_t total_program_memory() {
-      total_program_memory_kb = ESP.getFlashChipSize() / 1024; // Обновляем переменную
-      return total_program_memory_kb; // Возвращаем значение
+      total_program_memory_kb = ESP.getFlashChipSize() / 1024;
+      return total_program_memory_kb;
     }
 
     const char* chip_model() {
-      chip_model_name = ESP.getChipModel(); // Обновляем переменную
-      return chip_model_name; // Возвращаем значение
+      chip_model_name = ESP.getChipModel();
+      return chip_model_name;
     }
 
     uint16_t chip_revision() {
-      chip_revision_id = ESP.getChipRevision(); // Обновляем переменную
-      return chip_revision_id; // Возвращаем значение
+      chip_revision_id = ESP.getChipRevision();
+      return chip_revision_id;
     }
 
     uint32_t chip_id() {
-      chip_unique_id = calculate_chip_id(); // Обновляем переменную
-      return chip_unique_id; // Возвращаем значение
+      chip_unique_id = calculate_chip_id();
+      return chip_unique_id;
     }
 
     uint32_t cpu_freq() {
-      cpu_frequency_mhz = ESP.getCpuFreqMHz(); // Обновляем переменную
-      return cpu_frequency_mhz; // Возвращаем значение
+      cpu_frequency_mhz = ESP.getCpuFreqMHz();
+      return cpu_frequency_mhz;
     }
 
     uint8_t chip_cores() {
-      chip_core_count = ESP.getChipCores(); // Обновляем переменную
-      return chip_core_count; // Возвращаем значение
+      chip_core_count = ESP.getChipCores();
+      return chip_core_count;
     }
 
     // Метод для вывода всей информации
@@ -219,7 +220,7 @@ class Esp {
           if (Update.isFinished()) {
             Serial.println("Updating successful");
             Serial.println("Rebooting...");
-            ESP.restart();  // Перезагружаем устройство после успешного обновления
+            ESP.restart();
           } else {
             Serial.println("Update not finished. Something went wrong.");
           }
