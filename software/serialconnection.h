@@ -50,9 +50,10 @@ class SerialConnection {
                     }
                 }
               }
+
               // Обработка последовательностей для стрелок
               else if (c == 0x1B) {  // Начало escape-последовательности
-                  delay(10);
+                  delay(2);
                   if (Serial.available()) {
                       char nextChar = Serial.read();
                       if (nextChar == 0x5B) {  // Код для '['
@@ -74,25 +75,31 @@ class SerialConnection {
               }
               // Обработка обычных символов
               else if (c != '\n' && c != '\r') {
-                  // Вставляем символ в текущую позицию курсора
-                  this->input = this->input.substring(0, this->cursor_position) + c + this->input.substring(this->cursor_position);
-                  Serial.print(c); // Выводим символ
-                  Serial.print(this->input.substring(this->cursor_position + 1)); // Выводим оставшуюся часть строки
-                  for (int i = 0; i < this->input.length() - this->cursor_position - 1; i++) {
-                      Serial.print("\b"); // Возвращаем курсор на место
-                  }
-                  this->cursor_position++;  // Двигаем курсор вправо
+                // Вставляем символ в текущую позицию курсора
+                this->input = this->input.substring(0, this->cursor_position) + c + this->input.substring(this->cursor_position);
+                Serial.print(c); // Выводим символ
+            
+                // Если курсор не в конце строки, выводим оставшуюся часть строки
+                if (this->cursor_position < this->input.length() - 1) {
+                    Serial.print(this->input.substring(this->cursor_position + 1));
+                    // Возвращаем курсор на место
+                    for (int i = 0; i < this->input.length() - this->cursor_position - 1; i++) {
+                        Serial.print("\b");
+                    }
+                }
+            
+                this->cursor_position++;  // Двигаем курсор вправо
               } else {
-                  Serial.println();
-                  this->input.trim();  // Удаляем пробелы в начале и конце строки
-                  if (this->input.isEmpty()) {
-                      Serial.print(current_directory + " $ ");
-                  } else {
-                      // Когда строка закончилась, разделяем её на слова
-                      split_input_to_command();
-                  }
-                  cursor_position = input.length();  // Устанавливаем курсор в конец строки после ввода
-              }
+                Serial.println(); // Переход на новую строку
+                this->input.trim();  // Удаляем пробелы в начале и конце строки
+                if (this->input.isEmpty()) {
+                    Serial.print(current_directory + " $ ");
+                } else {
+                    // Когда строка закончилась, разделяем её на слова
+                    split_input_to_command();
+                }
+                cursor_position = 0;  // Сбрасываем позицию курсора
+            }
           }
       }
   
@@ -166,22 +173,25 @@ class SerialConnection {
       }
   
       void split_input_to_command() {
-          String word = "";
-          for (size_t i = 0; i < this->input.length(); i++) {
-              char c = this->input[i];
-              if (c == ' ') {
-                  if (word.length() > 0) {
-                      command.push_back(word); // Добавляем слово в массив
-                      word = ""; // Очищаем временное слово
-                  }
-              } else {
-                  word += c; // Добавляем символ к слову
-              }
-          }
-          if (word.length() > 0) {
-              command.push_back(word); // Добавляем последнее слово
-          }
-      }
+        String word = "";
+        for (size_t i = 0; i < this->input.length(); i++) {
+            char c = this->input[i];
+            if (c == ' ') {
+                if (word.length() > 0) {
+                    command.push_back(word); // Добавляем слово в массив
+                    word = ""; // Очищаем временное слово
+                }
+            } else {
+                word += c; // Добавляем символ к слову
+            }
+        }
+        if (word.length() > 0) {
+            command.push_back(word); // Добавляем последнее слово
+        }
+    
+        // Сбрасываем курсор и очищаем ввод
+        cursor_position = 0;
+    }
   
       std::vector<String> get_command() {
           return this->command;
