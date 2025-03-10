@@ -6,6 +6,9 @@
 
 #include <WiFi.h>
 
+extern WiFiServer telnetServer(23);  // Порт Telnet (23)
+WiFiClient telnetClient;
+
 class Wifi {
   public:
     // Подключение к WiFi
@@ -40,10 +43,15 @@ class Wifi {
       Serial.println("Connected to the WiFi network");
       Serial.print("Local ESP32 IP: ");
       Serial.println(WiFi.localIP());
+
+      telnetServer.begin();
+      telnetServer.setNoDelay(true);
     }
 
     // Отключение от WiFi
     void disconnect_wifi() {
+      telnetServer.stop();
+      telnetClient.stop();
       if (WiFi.status() == WL_CONNECTED) {
         WiFi.disconnect();
         Serial.println("Disconnected from WiFi");
@@ -55,6 +63,8 @@ class Wifi {
 
     // Переподключение к WiFi
     void reconnect_wifi() {
+      telnetServer.stop();
+      telnetClient.stop();
       WiFi.reconnect();
       Serial.println("Reconnecting to WiFi...");
       while (WiFi.status() != WL_CONNECTED) {
@@ -64,6 +74,8 @@ class Wifi {
       Serial.println("\nReconnected to WiFi");
       Serial.print("Local ESP32 IP: ");
       Serial.println(WiFi.localIP());
+      telnetServer.begin();
+      telnetServer.setNoDelay(true);
     }
 
     // Статус подключения

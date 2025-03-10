@@ -589,6 +589,7 @@ class SdCard{
 
       // Проверка инициализации
       color.print_info("Checking SD Card initialization... ");
+      SD.end();
       if (mount_sd()) {
           color.print_success("PASSED", true);
           init_status = true;
@@ -600,6 +601,7 @@ class SdCard{
 
       // Проверка объёма памяти
       if (!skip_tests) {
+          update_info();
           color.print_info("Checking SD Card memory...", true);
           color.print_log("  Total Space: " + String(cardSize) + " KB", true);
           color.print_log("  Used Space: " + String(cardUsage) + " KB", true);
