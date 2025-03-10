@@ -57,6 +57,39 @@ This document contains a list of available commands with brief descriptions, par
 
 ## Installation
 
+### Alternative Installation for ESP32-C3
+If you are using an **ESP32-C3**, you can install the system using **esptool** or a similar tool. Follow these steps:
+
+1. Go to the [Releases](https://github.com/VLPLAY-Games/XenoOS/releases) section on GitHub.
+2. Download the latest firmware archive.
+3. You can either flash the **merged firmware** or each file separately:
+   - To flash the merged firmware:
+     ```bash
+     esptool.py --chip esp32c3 --baud 921600 write_flash 0x0 XenoOS.merged.bin
+     ```
+     If you have multiple devices connected, specify the port explicitly:
+     ```bash
+     esptool.py --chip esp32c3 --port /dev/ttyUSB0 --baud 921600 write_flash 0x0 XenoOS.merged.bin
+     ```
+   - To flash each file individually:
+     ```bash
+     esptool.py --chip esp32c3 --baud 921600 write_flash \
+       0x1000 XenoOS.bootloader.bin \
+       0x8000 XenoOS.partitions.bin \
+       0x10000 XenoOS.bin
+     ```
+     Again, if multiple devices are connected, specify the port:
+     ```bash
+     esptool.py --chip esp32c3 --port /dev/ttyUSB0 --baud 921600 write_flash \
+       0x1000 XenoOS.bootloader.bin \
+       0x8000 XenoOS.partitions.bin \
+       0x10000 XenoOS.bin
+     ```
+After completing these steps, the system should be running on your device.
+---
+
+### Standard Installation via Arduino IDE
+
 To install and set up the system, follow these steps:
 
 1. **Prerequisites**:
@@ -99,7 +132,6 @@ To install and set up the system, follow these steps:
     5. Click **Upload** to flash the system onto your ESP32-C3.
 
 After completing these steps, the system should be running on your device.
-
 
 ## Usage
 
