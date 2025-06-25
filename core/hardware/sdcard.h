@@ -156,24 +156,65 @@ class SdCard{
       }
     }
 
-    void createDir(fs::FS &fs, const char *path) {
+    bool createDir(fs::FS &fs, const char *path) {
+      String normalized_path = normalize_path(path);
+      String resolved_path = resolve_path(normalized_path);
       Serial.printf("Creating Dir: %s\r\n", path);
-      if (fs.mkdir(path)) {
+      if (fs.mkdir(resolved_path)) {
         Serial.println("Dir created");
+        return true;
       } else {
         Serial.println("mkdir failed");
+        return false;
       }
     }
 
 
-    void removeDir(fs::FS &fs, const char *path) {
-      Serial.printf("Removing Dir: %s\r\n", path);
-      if (fs.rmdir(path)) {
-        Serial.println("Dir removed");
+    bool removeDir(fs::FS &fs, const char *path) {
+      String normalized_path = normalize_path(path);
+      String resolved_path = resolve_path(normalized_path);
+      
+      Serial.printf("Directory delete: %s\r\n", resolved_path.c_str());
+
+      // Открываем директорию
+      File dir = fs.open(resolved_path.c_str());
+      if (!dir || !dir.isDirectory()) {
+          Serial.println("Error opening directory");
+          return false;
+      }
+
+      // Рекурсивно удаляем все содержимое
+      File file = dir.openNextFile();
+      while (file) {
+          String filePath = resolved_path + "/" + String(file.name());
+          
+          if (file.isDirectory()) {
+              // Рекурсивный вызов для поддиректории
+              if (!removeDir(SD, filePath.c_str())) {
+                  file.close();
+                  dir.close();
+                  return false;
+              }
+          } else {
+              // Удаление файла
+              deleteFile(SD, filePath.c_str());
+          }
+          file = dir.openNextFile();
+      }
+
+      // Закрываем директорию
+      dir.close();
+
+      // Удаляем саму пустую директорию
+      if (fs.rmdir(resolved_path.c_str())) {
+          Serial.println("Directory delete success");
+          return true;
       } else {
-        Serial.println("rmdir failed");
+          Serial.println("Directory delete fail");
+          return false;
       }
     }
+
 
     void readFile(fs::FS &fs, const char *path) {
       Serial.printf("Reading file: %s\r\n", path);
@@ -493,24 +534,27 @@ class SdCard{
       return size;
     }
 
-    void create_empty_file(const char* path) {
-      Serial.printf("Creating empty file: %s\r\n", path);
+    bool create_empty_file(const char* path) {
+      String normalized_path = normalize_path(path);
+      String resolved_path = resolve_path(normalized_path);
+      Serial.printf("Creating empty file: %s\r\n", resolved_path);
 
       // Проверяем, существует ли файл
-      if (SD.exists(path)) {
+      if (SD.exists(resolved_path)) {
         Serial.println("File already exists");
-        return;
+        return false;
       }
 
       // Открываем файл в режиме записи, создавая его
-      File file = SD.open(path, FILE_WRITE);
+      File file = SD.open(resolved_path, FILE_WRITE);
       if (!file) {
         Serial.println("Failed to create file");
-        return;
+        return false;
       }
 
       Serial.println("Empty file created successfully");
       file.close();
+      return true;
     }
 
     // Проверка типа файла

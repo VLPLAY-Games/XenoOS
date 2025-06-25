@@ -51,6 +51,13 @@ public:
         print_custom(text, ANSI_CYAN, need_ln);
     }
 
+    // Печать результата
+    template <typename T>
+    static void print_result(const T& text, bool need_ln = false) {
+        if (text) print_success("OK", need_ln);
+        else if (!text) print_error("ERROR", need_ln);
+    }
+
     // Универсальная функция для печати с цветом
     template <typename T>
     static void print_custom(const T& text, const char* color, bool need_ln = false) {

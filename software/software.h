@@ -11,7 +11,9 @@ class System {
     Help help;
     History history;
     Eeprom eeprom;
-    const char* system_commands[5] = {"restart", "info", "update", "diagnostic", "help"}; // Массив строк с командами
+    const char* system_commands[6] = {"restart", "info", "update", "diagnostic", "freset" "help"}; // Массив строк с командами
+    bool confirmation_pending = false; // Флаг ожидания подтверждения
+    String pending_command;            // Сохраненная команда для выполнения после подтверждения
 
 
     void handle_system_commands(const std::vector<String>& command, Esp esp, SdCard sd, Wifi wifi, Spiffs spiffs, Eeprom eeprom) {
@@ -31,6 +33,10 @@ class System {
         Wget wget(wifi, sd);
         SystemUpdate upd(wget, esp, wifi, sd);
         upd.handle_update_commands(command);
+      } else if (command[1] == "freset") {
+          Serial.println("You want to make a system factory reset. Do you want to continue? (yes/no)");
+          confirmation_pending = true; // Устанавливаем флаг ожидания
+          pending_command = "system freset"; // Сохраняем полную команду
       }
       // Обработка команды "help"
       else if (command[1] == "help") {
@@ -42,14 +48,45 @@ class System {
       }
     }
 
+    // Функция обработки подтверждения
+    void handle_confirmation(const String& response, SdCard& sd, Esp esp) {
+        if (pending_command == "system freset") {
+          if (response == "yes") {
+            Serial.println("Performing factory reset...");
+            // Выполняем действия по сбросу
+            
+            Freset freset;
+            Installer installer;
+
+            bool reset_success = freset.factory_reset(sd, esp);
+            if (reset_success) {
+              Serial.println("\r\nFactory reset success \r\nPreparing to reinstall system files");
+              bool install_success = installer.install_sys_files(sd, esp);
+              if (install_success) Serial.println("\r\nReinstalling system files successfully \r\nRebooting");
+              else Serial.println("\r\nReinstalling system files ERROR \nRebooting");
+            } else Serial.println("\r\nFactory reset ERROR \r\nRebooting");
+            funcs.restart(esp);
+          } else {
+            Serial.println("Factory reset canceled.");
+          }
+        }
+        
+        confirmation_pending = false;
+        pending_command = "";
+    }
+
   public:
     void check_input(Esp esp, Wifi wifi, SdCard sd, Spiffs spiffs, Eeprom eeprom) {
       sc.read_serial(sd);
       auto command = sc.get_command();
+
       if (!command.empty()) {
         Serial.println();
 
-        if (!command.empty() && command[0] == "system") {
+        // Если ожидается подтверждение
+        if (confirmation_pending) handle_confirmation(command[0], sd, esp);
+  
+        else if (!command.empty() && command[0] == "system") {
           handle_system_commands(command, esp, sd, wifi, spiffs, eeprom);
         } else if (!command.empty() && command[0] == "cd") {
           Cd cd;

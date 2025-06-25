@@ -27,6 +27,8 @@
 #include "find.h"
 #include "df.h"
 #include "tar.h"
+#include "freset.h"
+#include "installer.h"
 
 class MainFuncs{
   private:
