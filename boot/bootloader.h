@@ -13,6 +13,7 @@ class Bootloader {
     Timer& timer;
     Spiffs spiffs;
     Eeprom eeprom;
+    Checker checker;
 
     // Инициализация загрузчика
     void initialize_bootloader() {
@@ -83,7 +84,10 @@ class Bootloader {
       timer.println_with_timer("     SD Card Information", "log");
       timer.println_with_timer("===========================", "log");
       bool sd_init = sd.init(timer);
-      if (sd_init) {
+
+      bool system_files_ok = checker.sys_checker(sd, &timer);
+
+      if (sd_init && system_files_ok) {
         timer.println_with_timer("SD Card module loaded successfully.", "success");
       } else {
         timer.println_with_timer("Failed to load SD Card module.", "error");
@@ -133,7 +137,7 @@ class Bootloader {
 
       timer.println_with_timer("");
 
-      if (sd_init && spiffs_init && eeprom_init) {
+      if (sd_init && system_files_ok && spiffs_init && eeprom_init) {
         boot_success = true;
       }
     }

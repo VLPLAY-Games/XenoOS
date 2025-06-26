@@ -21,9 +21,9 @@
 #include "core/hardware/spiffs.h"
 #include "core/hardware/eeprom.h"
 
+#include "software/main_funcs/main_funcs.h"
 #include "core/modules/diagnostics.h"
 
-#include "software/main_funcs/main_funcs.h"
 #include "software/serialconnection.h"
 #include "software/software.h"
 

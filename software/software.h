@@ -42,7 +42,7 @@ class System {
         checker.sys_checker(sd);  
       } else if (command[1] == "installer") {
          Installer installer;
-         installer.install_sys_files(sd, esp);
+         installer.install_sys_files(sd);
       } 
       // Обработка команды "help"
       else if (command[1] == "help") {
@@ -64,10 +64,10 @@ class System {
             Freset freset;
             Installer installer;
 
-            bool reset_success = freset.factory_reset(sd, esp);
+            bool reset_success = freset.factory_reset(sd);
             if (reset_success) {
               Serial.println("\r\nFactory reset success \r\nPreparing to reinstall system files");
-              bool install_success = installer.install_sys_files(sd, esp);
+              bool install_success = installer.install_sys_files(sd);
               if (install_success) Serial.println("\r\nReinstalling system files successfully \r\nRebooting");
               else Serial.println("\r\nReinstalling system files ERROR \nRebooting");
             } else Serial.println("\r\nFactory reset ERROR \r\nRebooting");

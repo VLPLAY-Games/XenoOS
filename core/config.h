@@ -5,5 +5,5 @@
 
 
 const char* core_version = "0.2.2";
-const char* core_date = "25.06.2025";
+const char* core_date = "26.06.2025";
 const char* core_name = "XenoOS Core";

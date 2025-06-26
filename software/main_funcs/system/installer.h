@@ -9,7 +9,7 @@ class Installer {
     ColorPrinter color;
     Checker checker;
   public:
-    bool install_sys_files(SdCard& sd, Esp esp) {
+    bool install_sys_files(SdCard& sd) {
         Serial.println("=== System Installer module ===");
         Serial.println();
 

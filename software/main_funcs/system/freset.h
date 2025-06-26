@@ -9,7 +9,7 @@ class Freset {
     ColorPrinter color;
     Checker checker;
   public:
-    bool factory_reset(SdCard& sd, Esp esp) {
+    bool factory_reset(SdCard& sd) {
         Serial.println("=== Factory reset module ===");
         Serial.println();
 

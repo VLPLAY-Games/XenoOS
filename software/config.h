@@ -10,7 +10,7 @@ const char* os_version = "0.2.2";
 const char* os_version_upd = "022";
 
 const char* made_by = "Made by VL_PLAY Games";
-const char* os_date = "25.06.2025";
+const char* os_date = "26.06.2025";
 const char* commands[] = {
   "wget", "mkdir", "ls", "cd", "rm", "wifi", "free", "sdcard", "clear", "system", "help", "cpu", "cat", "rename", "mac", "touch", "mv", "cp", "history", "hash", "ping", "find", "df", "tar"
 };

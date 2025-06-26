@@ -11,6 +11,8 @@ class Diagnostics {
         SdCard sd;
         Eeprom eeprom;
         ColorPrinter color;
+        Checker checker;
+        Installer installer;
 
     public:
 
@@ -39,6 +41,16 @@ class Diagnostics {
             bool sd_diagnostic = sd.diagnostics();
             Serial.println();
 
+            // Диагностика системных файлов
+            Serial.println("Checking System Integrity...");
+            bool sys_integrity_diagnostic = checker.sys_checker(sd);
+            bool installer_success = sys_integrity_diagnostic;
+            if (!sys_integrity_diagnostic) {
+                color.print_error("System Integrity needs to be recovered", true);
+                installer_success = installer.install_sys_files(sd);
+            }
+            Serial.println();
+
             // Диагностика EEPROM
             Serial.println("Checking EEPROM...");
             bool eeprom_diagnostic = eeprom.diagnostics();
@@ -59,13 +71,19 @@ class Diagnostics {
             color.print_info("SD Card: ");
             sd_diagnostic ? color.print_success("PASSED", true) : color.print_error("FAILED", true);
 
+            // Проверка системных файлов
+            color.print_info("System Integrity: ");
+            if (sys_integrity_diagnostic) color.print_success("PASSED", true);
+            else if (installer_success) color.print_warning("RECOVERED", true);
+            else color.print_error("FAILED", true);
+
             // Проверка EEPROM
             color.print_info("EEPROM: ");
             eeprom_diagnostic ? color.print_success("PASSED", true) : color.print_error("FAILED", true);
             
             Serial.println();
             // Итоговый результат диагностики
-            if (esp_diagnostic && spiffs_diagnostic && sd_diagnostic && eeprom_diagnostic) {
+            if (esp_diagnostic && spiffs_diagnostic && sd_diagnostic && eeprom_diagnostic && (sys_integrity_diagnostic || installer_success)) {
                 color.print_success("Diagnostic: PASSED", true);
             } else {
                 color.print_error("Diagnostic: FAILED", true);
