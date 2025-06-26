@@ -7,24 +7,11 @@
 class Installer {
   private:
     ColorPrinter color;
+    Checker checker;
   public:
     bool install_sys_files(SdCard& sd, Esp esp) {
         Serial.println("=== System Installer module ===");
         Serial.println();
-
-        const char* dirs_to_create[] = {
-            "/cfg",
-            "/downloads",
-            "/sys",
-            "/upd"
-        };
-        const char* files_to_create[] = {
-            "/cfg/date.cfg",
-            "/cfg/sys.cfg",
-            "/sys/history.log",
-        };
-        const size_t dir_count = sizeof(dirs_to_create) / sizeof(dirs_to_create[0]);
-        const size_t files_count = sizeof(files_to_create) / sizeof(files_to_create[0]);
 
         // Проверка SD Card
         Serial.print("Checking SD Card...   ");
@@ -39,25 +26,32 @@ class Installer {
 
         // Создание директорий
         bool all_operations_ok_dr = true;
-        for (size_t i = 0; i < dir_count; i++) {
-            Serial.printf("Creating %s directory on SD Card...   ", dirs_to_create[i]);
-            bool result = sd.createDir(SD, dirs_to_create[i]);
+        for (size_t i = 0; i < sys_dir_count; i++) {
+            bool result = true;
+            Serial.printf("Creating %s directory on SD Card...   ", sys_main_dirs[i]);
+            if (sd.is_path_exists(sys_main_dirs[i])) result = true;
+            else result = sd.createDir(SD, sys_main_dirs[i]);
             color.print_result(result, true);
             all_operations_ok_dr &= result;
         }
 
         // Создание файлов
         bool all_operations_ok_files = true;
-        for (size_t i = 0; i < files_count; i++) {
-            Serial.printf("Creating %s file on SD Card...   ", files_to_create[i]);
-            bool result = sd.create_empty_file(files_to_create[i]);
+        for (size_t i = 0; i < sys_files_count; i++) {
+            bool result = true;
+            Serial.printf("Creating %s file on SD Card...   ", sys_main_files[i]);
+            if (sd.is_path_exists(sys_main_files[i])) result = true;
+            else result = sd.create_empty_file(sys_main_files[i]);
             color.print_result(result, true);
             all_operations_ok_files &= result;
         }
+        bool all_operations_ok = false;
+        if (all_operations_ok_dr && all_operations_ok_files) all_operations_ok = true;
+        if (checker.check_sys_dirs_noexists(sd).size() != 0 || checker.check_sys_files_noexists(sd).size() != 0) all_operations_ok = false;
 
         // Итоговый результат
         Serial.print("System Installer module finished   ");
-        if (all_operations_ok_dr && all_operations_ok_files) {
+        if (all_operations_ok) {
             color.print_success("OK", true);
             return true;
         } else {

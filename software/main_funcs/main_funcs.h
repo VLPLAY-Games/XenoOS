@@ -28,6 +28,7 @@
 #include "fs/find.h"
 #include "fs/df.h"
 #include "archive/tar.h"
+#include "system/checker.h"
 #include "system/freset.h"
 #include "system/installer.h"
 

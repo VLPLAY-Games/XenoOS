@@ -7,18 +7,11 @@
 class Freset {
   private:
     ColorPrinter color;
+    Checker checker;
   public:
     bool factory_reset(SdCard& sd, Esp esp) {
         Serial.println("=== Factory reset module ===");
         Serial.println();
-
-        const char* dirs_to_remove[] = {
-            "/cfg",
-            "/downloads",
-            "/sys",
-            "/upd"
-        };
-        const size_t dir_count = sizeof(dirs_to_remove) / sizeof(dirs_to_remove[0]);
 
         // Проверка SD Card
         Serial.print("Checking SD Card...   ");
@@ -33,12 +26,15 @@ class Freset {
 
         // Удаление директорий
         bool all_operations_ok = true;
-        for (size_t i = 0; i < dir_count; i++) {
-            Serial.printf("Removing %s directory of SD Card...   ", dirs_to_remove[i]);
-            bool result = sd.removeDir(SD, dirs_to_remove[i]);
+        for (size_t i = 0; i < sys_dir_count; i++) {
+            Serial.printf("Removing %s directory of SD Card...   ", sys_main_dirs[i]);
+            bool result = false;
+            if (sd.is_path_exists(sys_main_dirs[i])) result = sd.removeDir(SD, sys_main_dirs[i]);
+            else result = true;
             color.print_result(result, true);
             all_operations_ok &= result;
         }
+        if (checker.check_sys_dirs_noexists(sd, true).size() != 0 || checker.check_sys_files_noexists(sd, true).size() != 0) all_operations_ok = false;
 
         // Итоговый результат
         Serial.print("Factory reset module finished   ");

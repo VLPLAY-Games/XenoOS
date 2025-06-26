@@ -19,3 +19,20 @@ bool system_started = false;
 const char* sys_upd_url = "https://raw.githubusercontent.com/VLPLAY-Games/Updates/main/XenoOS/firmware.bin";
 const char* sys_upd_url_txt = "https://raw.githubusercontent.com/VLPLAY-Games/Updates/main/XenoOS/update.txt";
 const char* historylog_path = "/sys/history.log";
+
+const char* sys_main_dirs[] = {
+  "/cfg",
+  "/downloads",
+  "/sys",
+  "/upd"
+};
+
+const size_t sys_dir_count = sizeof(sys_main_dirs) / sizeof(sys_main_dirs[0]);
+
+const char* sys_main_files[] = {
+  "/cfg/date.cfg",
+  "/cfg/sys.cfg",
+  "/sys/history.log",
+};
+
+const size_t sys_files_count = sizeof(sys_main_files) / sizeof(sys_main_files[0]);

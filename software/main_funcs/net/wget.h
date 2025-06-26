@@ -137,7 +137,7 @@ class Wget {
       
       // Формируем полный путь для сохранения файла
       String file_path = sdcard.resolve_path(resolved_path + "/" + filename);
-      if (sdcard.is_exists(file_path.c_str())){
+      if (sdcard.is_path_exists(file_path.c_str())){
         Serial.printf("Error: file with path and name %s already exists\r\n", file_path.c_str());
         return;
       }

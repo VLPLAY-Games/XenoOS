@@ -350,8 +350,10 @@ class SdCard{
       Serial.println("===========================");
     }
 
-    bool is_exists(const char* path){
-      if (SD.exists(path)){
+    bool is_path_exists(const char* path){
+      String normalized_path = normalize_path(path);
+      String resolved_path = resolve_path(normalized_path);
+      if (SD.exists(resolved_path)){
         return true;
       }
       return false;

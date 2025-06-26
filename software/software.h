@@ -11,7 +11,7 @@ class System {
     Help help;
     History history;
     Eeprom eeprom;
-    const char* system_commands[6] = {"restart", "info", "update", "diagnostic", "freset" "help"}; // Массив строк с командами
+    const char* system_commands[8] = {"restart", "info", "update", "diagnostic", "freset", "check", "installer", "help"}; // Массив строк с командами
     bool confirmation_pending = false; // Флаг ожидания подтверждения
     String pending_command;            // Сохраненная команда для выполнения после подтверждения
 
@@ -34,10 +34,16 @@ class System {
         SystemUpdate upd(wget, esp, wifi, sd);
         upd.handle_update_commands(command);
       } else if (command[1] == "freset") {
-          Serial.println("You want to make a system factory reset. Do you want to continue? (yes/no)");
-          confirmation_pending = true; // Устанавливаем флаг ожидания
-          pending_command = "system freset"; // Сохраняем полную команду
-      }
+        Serial.println("You want to make a system factory reset. Do you want to continue? (yes/no)");
+        confirmation_pending = true; // Устанавливаем флаг ожидания
+        pending_command = "system freset"; // Сохраняем полную команду
+      } else if (command[1] == "check") {
+        Checker checker;
+        checker.sys_checker(sd);  
+      } else if (command[1] == "installer") {
+         Installer installer;
+         installer.install_sys_files(sd, esp);
+      } 
       // Обработка команды "help"
       else if (command[1] == "help") {
         Serial.print("Available system commands: ");
