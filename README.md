@@ -3,21 +3,21 @@
 
 [Read in Russian](README_RU.md)
 
-- XenoOS Core v0.2.1
-- XenoOS Bootloader v0.2.0
-- XenoOS Recovery v0.2.0
-- XenoOS Software v0.2.1
+- XenoOS Core v0.2.2
+- XenoOS Bootloader v0.2.1
+- XenoOS Recovery v0.2.1
+- XenoOS Software v0.2.2
 
 ## Overview
 
-This is a command-line interface (CLI) system for interacting with various system components such as filesystems, Wi-Fi, SD cards, and system diagnostics. The system supports a variety of commands for managing files, directories, and system configurations.
+This is a command-line interface (CLI) system for interacting with various system components such as filesystems, Wi-Fi, SD cards, and other system settings. The system supports a variety of commands for managing files, directories, and system configurations.
 
 The system is designed for the entire ESP32 family of microcontrollers but is specifically tailored for the ESP32-C3 model.
 
 ## Features
 
 - File management (e.g., create, remove, rename files)
-- System diagnostics
+- System diagnostics, factory reset, reinstall
 - Wi-Fi connectivity management
 - SD card interaction
 - Command history
@@ -39,7 +39,7 @@ This document contains a list of available commands with brief descriptions, par
 | `free`    | Show available memory           | -                                               | `free`                              |
 | `sdcard`  | Manage SD card                  | `info, help`                                    | `sdcard info`                       |
 | `clear`   | Clear the screen                | -                                               | `clear`                             |
-| `system`  | System commands                 | `restart, info, update, diagnostic, help`       | `system restart`                   |
+| `system`  | System commands                 | `restart, info, update, diagnostic, freset, check, installer, help`       | `system restart`                   |
 | `cpu`     | Display processor information   | `info, temp`                                    | `cpu info`                          |
 | `cat`     | Read file contents              | `<path_to_file>`                                | `cat /path/to/file`                |
 | `rename`  | Rename files                    | `<old_file_path> <new_file_path>`               | `rename /path/oldname /path/newname` |
@@ -53,7 +53,6 @@ This document contains a list of available commands with brief descriptions, par
 | `find`    | Search for files                | `<path_to_search>`                              | `find /path/to/search`             |
 | `df`      | Display filesystem information  | `info`                                          | `df info`                          |
 | `tar`     | Work with archives              | `extract, help`                                 | `tar extract archive.tar`          |
-
 
 ## Installation
 
@@ -94,7 +93,7 @@ To install and set up the system, follow these steps:
 
 1. **Prerequisites**:
     - You must have **Arduino IDE 2.x** installed.
-    - Ensure the **ESP32 core version 3.1.0 or later** is installed in Arduino IDE.
+    - Ensure the **ESP32 core version 3.2.0 or later** is installed in Arduino IDE.
     - You will also need the following libraries installed:
       - `buildTime` version 1.0.0
       - `ESPping` version 1.0.5
@@ -135,7 +134,7 @@ After completing these steps, the system should be running on your device.
 
 ## Usage
 
-Once installed, you can interact with the system via Serial port (Speed 115200) in Putty (or Arduino IDE Serial terminal (not recommended))by typing commands directly into the terminal or console. Refer to the "Command List" above for all available commands and their usage examples.
+Once installed, you can interact with the system via Serial port (Speed 115200) in Putty by typing commands directly into the terminal or console. Refer to the "Command List" above for all available commands and their usage examples.
 
 ## Diagnostics
 
@@ -143,6 +142,7 @@ To perform a system diagnostic, use the following command:
 
 ```bash
 system diagnostic
+system check
 ```
 
 This will run a series of tests to check the health of different components such as the ESP32, SPIFFS, SD card, and EEPROM.
