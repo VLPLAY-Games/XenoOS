@@ -227,7 +227,9 @@ class SdCard{
       Serial.println("Read from file: ");
       Serial.println();
       while (file.available()) {
-        Serial.write(file.read());
+        char c = file.read();
+        if (c == '\n') Serial.write('\r');
+        Serial.write(c);
       }
       file.close();
     }

@@ -180,12 +180,12 @@ class Spiffs {
 
     // Функция для получения общего объема памяти
     uint32_t total_memory() {
-      return SPIFFS.totalBytes();
+      return SPIFFS.totalBytes() / 1024;
     }
 
     // Функция для получения использованного объема памяти
     uint32_t used_memory() {
-      return SPIFFS.usedBytes();
+      return SPIFFS.usedBytes() / 1024;
     }
 
     // Функция для получения оставшегося объема памяти
@@ -195,9 +195,9 @@ class Spiffs {
 
     void print_info(Timer* timer = nullptr){
       if (timer) {
-        timer->println_with_timer(String("  SPIFFS Total: ") + (total_memory() / 1024) + String(" KB"));
-        timer->println_with_timer(String("  SPIFFS Used: ") + (used_memory() / 1024) + String(" KB"));
-        timer->println_with_timer(String("  SPIFFS Free: ") + (free_memory() / 1024) + String(" KB"));
+        timer->println_with_timer(String("  SPIFFS Total: ") + total_memory() + String(" KB"));
+        timer->println_with_timer(String("  SPIFFS Used: ") + used_memory() + String(" KB"));
+        timer->println_with_timer(String("  SPIFFS Free: ") + free_memory() + String(" KB"));
       } else {
         Serial.printf("  SPIFFS Total: %s KB\r\n", total_memory() / 1024);
         Serial.printf("  SPIFFS Used: %s KB\r\n", used_memory() / 1024);

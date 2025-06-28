@@ -87,6 +87,7 @@ class System {
       auto command = sc.get_command();
 
       if (!command.empty()) {
+        history.write_history((sc.get_input() + "\n").c_str(), sd);
         Serial.println();
 
         // Если ожидается подтверждение
@@ -158,8 +159,6 @@ class System {
         else if (sc.get_input() == "clear") funcs.clear();
         else if (sc.get_input() == "help") funcs.help_commands();
         else Serial.println(sc.get_input() + ": Unknown command");
-        
-        history.write_history((sc.get_input() + "\n").c_str(), sd);
 
         sc.empty_command();
         sc.empty_input();
