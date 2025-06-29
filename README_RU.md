@@ -2,10 +2,10 @@
 
 [Читать на Английском](README.md)
 
-- XenoOS Core v0.2.2
+- XenoOS Core v0.2.3
 - XenoOS Bootloader v0.2.1
 - XenoOS Recovery v0.2.1
-- XenoOS Software v0.2.2
+- XenoOS Software v0.2.3
 
 
 ## Обзор
