@@ -17,8 +17,8 @@ class Diagnostics {
     public:
 
         // Конструктор
-        Diagnostics(Esp& esp_instance, Spiffs& spiffs_instance, SdCard& sd_instance, Eeprom& eeprom_instance) 
-        : esp(esp_instance), spiffs(spiffs_instance), sd(sd_instance), eeprom(eeprom_instance) {}
+        Diagnostics(Esp& esp_instance, Spiffs& spiffs_instance, SdCard& sd_instance, Eeprom& eeprom_instance, Installer& installer_instance) 
+        : esp(esp_instance), spiffs(spiffs_instance), sd(sd_instance), eeprom(eeprom_instance), installer(installer_instance)  {}
 
 
         // Функция диагностики
@@ -47,7 +47,7 @@ class Diagnostics {
             bool installer_success = sys_integrity_diagnostic;
             if (!sys_integrity_diagnostic) {
                 color.print_error("System Integrity needs to be recovered", true);
-                installer_success = installer.install_sys_files(sd);
+                installer_success = installer.install_sys_files();
             }
             Serial.println();
 

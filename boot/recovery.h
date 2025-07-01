@@ -37,7 +37,8 @@ class RecoveryMode{
     
 
     void recovery() {
-      Diagnostics diagnostic(esp, spiffs, sd, eeprom);
+      Installer installer(&sd);
+      Diagnostics diagnostic(esp, spiffs, sd, eeprom, installer);
       timer.println_with_timer("Performing system diagnostics...");
       diagnostic.diagnostics();
 

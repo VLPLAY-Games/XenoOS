@@ -27,7 +27,8 @@ class System {
       } else if (command[1] == "info") {
         funcs.info(esp);
       } else if (command[1] == "diagnostic") {
-        Diagnostics diagnostic(esp, spiffs, sd, eeprom);
+        Installer installer(&sd);
+        Diagnostics diagnostic(esp, spiffs, sd, eeprom, installer);
         diagnostic.diagnostics();
       } else if (command[1] == "update") {
         Wget wget(wifi, sd);
@@ -41,8 +42,8 @@ class System {
         Checker checker;
         checker.sys_checker(sd);  
       } else if (command[1] == "installer") {
-         Installer installer;
-         installer.install_sys_files(sd);
+         Installer installer(&sd);
+         installer.install_sys_files();
       } 
       // Обработка команды "help"
       else if (command[1] == "help") {
@@ -62,12 +63,12 @@ class System {
             // Выполняем действия по сбросу
             
             Freset freset;
-            Installer installer;
+            Installer installer(&sd);
 
             bool reset_success = freset.factory_reset(sd);
             if (reset_success) {
               Serial.println("\r\nFactory reset success \r\nPreparing to reinstall system files");
-              bool install_success = installer.install_sys_files(sd);
+              bool install_success = installer.install_sys_files();
               if (install_success) Serial.println("\r\nReinstalling system files successfully \r\nRebooting");
               else Serial.println("\r\nReinstalling system files ERROR \nRebooting");
             } else Serial.println("\r\nFactory reset ERROR \r\nRebooting");
