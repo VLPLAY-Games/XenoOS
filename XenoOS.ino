@@ -25,7 +25,7 @@
 #include "core/modules/diagnostics.h"
 
 #include "software/serialconnection.h"
-#include "software/software.h"
+#include "software/software_core.h"
 
 #include "boot/recovery.h"
 #include "boot/bootloader.h"
