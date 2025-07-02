@@ -10,79 +10,132 @@ class System {
     SerialConnection sc;
     Help help;
     History history;
+    Esp esp;
+    Wifi wifi;
+    SdCard sd;
+    Spiffs spiffs;
     Eeprom eeprom;
-    const char* system_commands[8] = {"restart", "info", "update", "diagnostic", "freset", "check", "installer", "help"}; // Массив строк с командами
-    bool confirmation_pending = false; // Флаг ожидания подтверждения
-    String pending_command;            // Сохраненная команда для выполнения после подтверждения
 
+    Installer* installer;
+    ModuleManager* modMgr;
 
-    void handle_system_commands(const std::vector<String>& command, Esp esp, SdCard sd, Wifi wifi, Spiffs spiffs, Eeprom eeprom) {
+    const char* system_commands[9] = {
+      "restart","info","update","diagnostic",
+      "freset","check","installer","mod","help"
+    };
+    bool confirmation_pending = false;
+    String pending_command;
+
+    void handle_system_commands(const std::vector<String>& command) {
       if (command.size() < 2) {
         Serial.println("Incomplete system command");
         return;
       }
-
-      if (command[1] == "restart") {
+      const String& cmd = command[1];
+      if (cmd == "restart") {
         funcs.restart(esp);
-      } else if (command[1] == "info") {
+      }
+      else if (cmd == "info") {
         funcs.info(esp);
-      } else if (command[1] == "diagnostic") {
-        Installer installer(&sd);
-        Diagnostics diagnostic(esp, spiffs, sd, eeprom, installer);
+      }
+      else if (cmd == "diagnostic") {
+        Diagnostics diagnostic(esp, spiffs, sd, eeprom, *installer);
         diagnostic.diagnostics();
-      } else if (command[1] == "update") {
+      }
+      else if (cmd == "update") {
         Wget wget(wifi, sd);
         SystemUpdate upd(wget, esp, wifi, sd);
         upd.handle_update_commands(command);
-      } else if (command[1] == "freset") {
-        Serial.println("You want to make a system factory reset. Do you want to continue? (yes/no)");
-        confirmation_pending = true; // Устанавливаем флаг ожидания
-        pending_command = "system freset"; // Сохраняем полную команду
-      } else if (command[1] == "check") {
+      }
+      else if (cmd == "freset") {
+        Serial.println("You want to make a system factory reset. Continue? (yes/no)");
+        confirmation_pending = true;
+        pending_command = "system freset";
+      }
+      else if (cmd == "check") {
         Checker checker;
-        checker.sys_checker(sd);  
-      } else if (command[1] == "installer") {
-         Installer installer(&sd);
-         installer.install_sys_files();
-      } 
-      // Обработка команды "help"
-      else if (command[1] == "help") {
+        checker.sys_checker(sd);
+      }
+      else if (cmd == "installer") {
+        installer->install_sys_files();
+      }
+      else if (cmd == "mod") {
+        // Module management: install, flash, run, remove, ls
+        if (command.size() < 3) {
+          Serial.println("Usage: system mod <install|flash|run|remove|ls> [args]");
+          return;
+        }
+        const String& sub = command[2];
+        if (sub == "install") {
+          if (command.size() < 4) Serial.println("Usage: system mod install <sd_path>");
+          else installer->install_from_sd(command[3].c_str());
+        }
+        else if (sub == "flash") {
+          if (command.size() < 4) Serial.println("Usage: system mod flash <sd_path>");
+          else installer->install_module_to_flash(command[3].c_str());
+          modMgr->scanModules();
+        }
+        else if (sub == "run") {
+          // args after name are passed to module
+          std::vector<String> args(command.begin()+3, command.end());
+          modMgr->scanModules();
+          if (!modMgr->handleCommand(std::vector<String>(args.begin()-1, args.end()))) {
+            Serial.println("Module not found or failed to run");
+          }
+        }
+        else if (sub == "remove") {
+          if (command.size() < 4) Serial.println("Usage: system mod remove <name>");
+          else {
+            installer->remove_module(command[3].c_str());
+            modMgr->scanModules();
+          }
+        }
+        else if (sub == "ls") {
+          sd.listDir(SD, MODULES_DIR, 0);
+        }
+        else {
+          Serial.println("Unknown subcommand for system mod");
+        }
+      }
+      else if (cmd == "help") {
         Serial.print("Available system commands: ");
-        help.print_help(system_commands, sizeof(system_commands) / sizeof(system_commands[0]));
-      } 
+        help.print_help(system_commands, 9);
+      }
       else {
         Serial.println("Unknown system command");
       }
     }
 
-    // Функция обработки подтверждения
-    void handle_confirmation(const String& response, SdCard& sd, Esp esp) {
-        if (pending_command == "system freset") {
-          if (response == "yes") {
-            Serial.println("Performing factory reset...");
-            // Выполняем действия по сбросу
-            
-            Freset freset;
-            Installer installer(&sd);
-
-            bool reset_success = freset.factory_reset(sd);
-            if (reset_success) {
-              Serial.println("\r\nFactory reset success \r\nPreparing to reinstall system files");
-              bool install_success = installer.install_sys_files();
-              if (install_success) Serial.println("\r\nReinstalling system files successfully \r\nRebooting");
-              else Serial.println("\r\nReinstalling system files ERROR \nRebooting");
-            } else Serial.println("\r\nFactory reset ERROR \r\nRebooting");
-            funcs.restart(esp);
+    void handle_confirmation(const String& response) {
+      if (pending_command == "system freset") {
+        if (response == "yes") {
+          Serial.println("Performing factory reset...");
+          Freset freset;
+          bool reset_success = freset.factory_reset(sd);
+          if (reset_success) {
+            Serial.println("Factory reset success, reinstalling system files...");
+            installer->install_sys_files();
           } else {
-            Serial.println("Factory reset canceled.");
+            Serial.println("Factory reset ERROR");
           }
+          funcs.restart(esp);
+        } else {
+          Serial.println("Factory reset canceled.");
         }
-        
-        confirmation_pending = false;
-        pending_command = "";
+      }
+      confirmation_pending = false;
+      pending_command = "";
     }
 
   public:
+    System(Esp esp_instance, Wifi wifi_instance, SdCard sd_instance, Spiffs spiffs_instance, Eeprom eeprom_instance)
+      : esp(esp_instance), wifi(wifi_instance), sd(sd_instance), spiffs(spiffs_instance), eeprom(eeprom_instance) {
+        installer = new Installer(&sd);
+        modMgr = new ModuleManager(&sd, installer);
+        modMgr->scanModules();
+        Serial.print("Initialization complete. Ready. ");
+        Serial.print(current_directory + " $ ");
+    }
     void check_input(Esp esp, Wifi wifi, SdCard sd, Spiffs spiffs, Eeprom eeprom) {
       sc.read_serial(sd);
       auto command = sc.get_command();
@@ -91,75 +144,109 @@ class System {
         history.write_history((sc.get_input() + "\n").c_str(), sd);
         Serial.println();
 
-        // Если ожидается подтверждение
-        if (confirmation_pending) handle_confirmation(command[0], sd, esp);
-  
-        else if (!command.empty() && command[0] == "system") {
-          handle_system_commands(command, esp, sd, wifi, spiffs, eeprom);
-        } else if (!command.empty() && command[0] == "cd") {
+        if (confirmation_pending) {
+          handle_confirmation(command[0]);
+        }
+        else if (command[0] == "system") {
+          handle_system_commands(command);
+        }
+        else if (command[0] == "cd") {
           Cd cd;
           cd.handle_cd_commands(command, sd);
-        } else if (!command.empty() && command[0] == "ls") {
+        }
+        else if (command[0] == "ls") {
           Ls ls;
           ls.handle_ls_commands(command, sd);
-        } else if (!command.empty() && command[0] == "mkdir") {
+        }
+        else if (command[0] == "mkdir") {
           Mkdir mkdir;
           mkdir.handle_mkdir_commands(command, sd);
-        } else if (!command.empty() && command[0] == "rm") {
+        }
+        else if (command[0] == "rm") {
           Rm rm;
           rm.handle_rm_commands(command, sd);
-        } else if (!command.empty() && command[0] == "cpu") {
+        }
+        else if (command[0] == "cpu") {
           Cpu cpu;
           cpu.handle_cpu_commands(command, esp);
-        } else if (!command.empty() && command[0] == "sdcard") {
+        }
+        else if (command[0] == "sdcard") {
           Sd sd_task;
           sd_task.handle_sdcard_commands(command, sd);
-        } else if (!command.empty() && command[0] == "wifi") {
+        }
+        else if (command[0] == "wifi") {
           Wifi_T wf;
           wf.handle_wifi_commands(command, wifi);
-        } else if (!command.empty() && command[0] == "wget") {
+        }
+        else if (command[0] == "wget") {
           Wget wget(wifi, sd);
           wget.handle_wget_commands(command);
-        } else if (!command.empty() && command[0] == "cat") {
+        }
+        else if (command[0] == "cat") {
           Cat cat(sd);
           cat.handle_cat_commands(command);
-        } else if (!command.empty() && command[0] == "rename") {
+        }
+        else if (command[0] == "rename") {
           Rename rename(sd);
           rename.handle_rename_commands(command);
-        } else if (!command.empty() && command[0] == "mac") {
+        }
+        else if (command[0] == "mac") {
           Mac mac;
           mac.handle_mac_commands(command, esp);
-        } else if (!command.empty() && command[0] == "touch") {
+        }
+        else if (command[0] == "touch") {
           Touch touch;
           touch.handle_touch_commands(command, sd);
-        } else if (!command.empty() && command[0] == "mv") {
+        }
+        else if (command[0] == "mv") {
           Mv mv;
           mv.handle_mv_commands(command, sd);
-        } else if (!command.empty() && command[0] == "cp") {
+        }
+        else if (command[0] == "cp") {
           Cp cp;
           cp.handle_cp_commands(command, sd);
-        } else if (!command.empty() && command[0] == "history") {
+        }
+        else if (command[0] == "history") {
           history.handle_history_commands(command, sd);
-        } else if (!command.empty() && command[0] == "hash") {
+        }
+        else if (command[0] == "hash") {
           Hash hash;
           hash.handle_hash_commands(command, sd);
-        } else if (!command.empty() && command[0] == "ping") {
+        }
+        else if (command[0] == "ping") {
           Wifi_ping wifi_ping;
           wifi_ping.handle_ping_commands(command);
-        } else if (!command.empty() && command[0] == "find") {
+        }
+        else if (command[0] == "find") {
           Find find;
           find.handle_find_commands(command, sd);
-        } else if (!command.empty() && command[0] == "df") {
+        }
+        else if (command[0] == "df") {
           DF df(esp, spiffs, sd);
           df.handle_df_commands(command);
-        } else if (!command.empty() && command[0] == "tar") {
+        }
+        else if (command[0] == "tar") {
            Tar tar;
            tar.handle_tar_commands(command);
-        }  else if (sc.get_input() == "free") funcs.free(esp);
-        else if (sc.get_input() == "update") funcs.update();
-        else if (sc.get_input() == "clear") funcs.clear();
-        else if (sc.get_input() == "help") funcs.help_commands();
-        else Serial.println(sc.get_input() + ": Unknown command");
+        }
+        else if (sc.get_input() == "free") {
+          funcs.free(esp);
+        }
+        else if (sc.get_input() == "update") {
+          funcs.update();
+        }
+        else if (sc.get_input() == "clear") {
+          funcs.clear();
+        }
+        else if (sc.get_input() == "help") {
+          funcs.help_commands();
+        }
+        else {
+          // Попытка запустить модуль из /modules
+          if (!modMgr->handleCommand(command)) {
+            Serial.println(sc.get_input() + ": Unknown command");
+          }
+        }
 
         sc.empty_command();
         sc.empty_input();

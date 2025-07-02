@@ -37,7 +37,7 @@ SdCard sd;
 Wifi wifi;
 Esp esp(timer);
 Eeprom eeprom;
-System sys;
+System sys(esp, wifi, sd, spiffs, eeprom);
 
 
 void setup() {

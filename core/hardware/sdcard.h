@@ -623,6 +623,22 @@ class SdCard{
       return false;
     }
 
+    std::vector<String> listFiles(const char* path) {
+      std::vector<String> result;
+      File root = SD.open(path);
+      if (!root) return result;
+      if (!root.isDirectory()) {
+          root.close();
+          return result;
+      }
+      File file = root.openNextFile();
+      while (file) {
+          result.push_back(String(file.name()));
+          file = root.openNextFile();
+      }
+      root.close();
+      return result;
+    }
 
     // Функция диагностики
     bool diagnostics() {
