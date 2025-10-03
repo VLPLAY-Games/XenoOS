@@ -3,6 +3,7 @@
 
 - [Read in Russian](README.ru.md)
 - [Read in Japanese](README.ja.md)
+---
 
 - XenoOS Core v0.2.3
 - XenoOS Bootloader v0.2.1
