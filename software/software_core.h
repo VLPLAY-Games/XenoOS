@@ -17,11 +17,10 @@ class System {
     Eeprom eeprom;
 
     Installer* installer;
-    ModuleManager* modMgr;
 
-    const char* system_commands[9] = {
+    const char* system_commands[8] = {
       "restart","info","update","diagnostic",
-      "freset","check","installer","mod","help"
+      "freset","check","installer","help"
     };
     bool confirmation_pending = false;
     String pending_command;
@@ -59,44 +58,6 @@ class System {
       else if (cmd == "installer") {
         installer->install_sys_files();
       }
-      else if (cmd == "mod") {
-        // Module management: install, flash, run, remove, ls
-        if (command.size() < 3) {
-          Serial.println("Usage: system mod <install|flash|run|remove|ls> [args]");
-          return;
-        }
-        const String& sub = command[2];
-        if (sub == "install") {
-          if (command.size() < 4) Serial.println("Usage: system mod install <sd_path>");
-          else installer->install_from_sd(command[3].c_str());
-        }
-        else if (sub == "flash") {
-          if (command.size() < 4) Serial.println("Usage: system mod flash <sd_path>");
-          else installer->install_module_to_flash(command[3].c_str());
-          modMgr->scanModules();
-        }
-        else if (sub == "run") {
-          // args after name are passed to module
-          std::vector<String> args(command.begin()+3, command.end());
-          modMgr->scanModules();
-          if (!modMgr->handleCommand(std::vector<String>(args.begin()-1, args.end()))) {
-            Serial.println("Module not found or failed to run");
-          }
-        }
-        else if (sub == "remove") {
-          if (command.size() < 4) Serial.println("Usage: system mod remove <name>");
-          else {
-            installer->remove_module(command[3].c_str());
-            modMgr->scanModules();
-          }
-        }
-        else if (sub == "ls") {
-          sd.listDir(SD, MODULES_DIR, 0);
-        }
-        else {
-          Serial.println("Unknown subcommand for system mod");
-        }
-      }
       else if (cmd == "help") {
         Serial.print("Available system commands: ");
         help.print_help(system_commands, 9);
@@ -131,8 +92,6 @@ class System {
     System(Esp esp_instance, Wifi wifi_instance, SdCard sd_instance, Spiffs spiffs_instance, Eeprom eeprom_instance)
       : esp(esp_instance), wifi(wifi_instance), sd(sd_instance), spiffs(spiffs_instance), eeprom(eeprom_instance) {
         installer = new Installer(&sd);
-        modMgr = new ModuleManager(&sd, installer);
-        modMgr->scanModules();
         Serial.print("Initialization complete. Ready. ");
         Serial.print(current_directory + " $ ");
     }
@@ -242,10 +201,7 @@ class System {
           funcs.help_commands();
         }
         else {
-          // Попытка запустить модуль из /modules
-          if (!modMgr->handleCommand(command)) {
-            Serial.println(sc.get_input() + ": Unknown command");
-          }
+          Serial.println(sc.get_input() + ": Unknown command");
         }
 
         sc.empty_command();

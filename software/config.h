@@ -25,7 +25,6 @@ const char* sys_main_dirs[] = {
   "/downloads",
   "/sys",
   "/upd",
-  "/modules"
 };
 
 const size_t sys_dir_count = sizeof(sys_main_dirs) / sizeof(sys_main_dirs[0]);
