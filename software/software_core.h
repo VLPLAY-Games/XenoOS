@@ -200,6 +200,10 @@ class System {
         else if (sc.get_input() == "help") {
           funcs.help_commands();
         }
+        else if (command[0] == "xenolanguage") {
+          XenoLang xenolang;
+          xenolang.handle_xenolanguage_commands(command, sd);
+        }
         else {
           Serial.println(sc.get_input() + ": Unknown command");
         }

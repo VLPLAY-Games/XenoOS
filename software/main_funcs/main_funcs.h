@@ -31,6 +31,7 @@
 #include "system/checker.h"
 #include "system/freset.h"
 #include "system/installer.h"
+#include "xenolang/xenolang.h"
 
 class MainFuncs{
   private:

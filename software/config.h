@@ -6,13 +6,13 @@
 
 const char* os_name = "XenoOS";
 
-const char* os_version = "0.2.3";
-const char* os_version_upd = "023";
+const char* os_version = "0.2.4";
+const char* os_version_upd = "024";
 
 const char* made_by = "Made by VL_PLAY Games";
-const char* os_date = "28.06.2025";
+const char* os_date = "29.11.2025";
 const char* commands[] = {
-  "wget", "mkdir", "ls", "cd", "rm", "wifi", "free", "sdcard", "clear", "system", "help", "cpu", "cat", "rename", "mac", "touch", "mv", "cp", "history", "hash", "ping", "find", "df", "tar"
+  "wget", "mkdir", "ls", "cd", "rm", "wifi", "free", "sdcard", "clear", "system", "help", "cpu", "cat", "rename", "mac", "touch", "mv", "cp", "history", "hash", "ping", "find", "df", "tar", "xenolanguage"
 };
 const char* os_github = "github.com/VLPLAY-Games/XenoOS";
 bool system_started = false;
