@@ -8,7 +8,7 @@
 - XenoOS Core v0.2.3
 - XenoOS Bootloader v0.2.1
 - XenoOS Recovery v0.2.1
-- XenoOS Software v0.2.3
+- XenoOS Software v0.2.4
 
 ## Overview
 
@@ -55,6 +55,7 @@ This document contains a list of available commands with brief descriptions, par
 | `find`    | Search for files                | `<path_to_search>`                              | `find /path/to/search`             |
 | `df`      | Display filesystem information  | `info`                                          | `df info`                          |
 | `tar`     | Work with archives              | `extract, help`                                 | `tar extract archive.tar`          |
+| `xenolanguage` | Execute .xeno files        | `run, compile, execute, security_info`          | `xenolanguage -max_instr=5000 -max_string_len=100 run /apps/game.xeno`         |
 
 ## Installation
 
@@ -100,6 +101,7 @@ To install and set up the system, follow these steps:
       - `buildTime` version 1.0.0
       - `ESPping` version 1.0.5
       - `ESP32-targz` version 1.2.6
+      - `Xeno Language` version 0.1.4 or later
 
 2. **Hardware Setup**:
     - This system is designed for the **ESP32 family**, specifically developed for the **ESP32-C3**.

@@ -6,7 +6,7 @@
 - XenoOS Core v0.2.3
 - XenoOS Bootloader v0.2.1
 - XenoOS Recovery v0.2.1
-- XenoOS Software v0.2.3
+- XenoOS Software v0.2.4
 
 
 ## Обзор
@@ -54,6 +54,7 @@
 | `find`    | Поиск файлов                    | `<path_to_search>`                              | `find /path/to/search`                 |
 | `df`      | Отобразить информацию о файловой системе | `info`                                   | `df info`                              |
 | `tar`     | Работа с архивами               | `extract, help`                                 | `tar extract archive.tar`              |
+| `xenolanguage` | Выполнение .xeno файлов        | `run, compile, execute, security_info`          | `xenolanguage -max_instr=5000 -max_string_len=100 run /apps/game.xeno`         |
 
 ## Установка
 
@@ -100,6 +101,7 @@
       - `buildTime` версии 1.0.0
       - `ESPping` версии 1.0.5
       - `ESP32-targz` версии 1.2.6
+      - `Xeno Language` версии 0.1.4 или новее
 
 2. **Настройка оборудования**:
     - Система разработана для **семейства ESP32**, но специально оптимизирована для **ESP32-C3**.
