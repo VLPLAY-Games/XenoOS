@@ -149,4 +149,45 @@ class Wifi {
       }
       return true;
     }
+
+    // Запуск точки доступа WiFi (AP)
+    void start_ap(const char* ap_ssid, const char* ap_password, uint8_t channel = 1, bool hidden = false, uint8_t max_conn = 4) {
+      Serial.println("Starting WiFi Access Point...");
+
+      // Переключаемся в режим AP или AP+STA
+      WiFi.mode(WIFI_AP);
+
+      bool result;
+      if (ap_password && strlen(ap_password) >= 8) {
+        result = WiFi.softAP(ap_ssid, ap_password, channel, hidden, max_conn);
+      } else {
+        // Открытая сеть
+        result = WiFi.softAP(ap_ssid, nullptr, channel, hidden, max_conn);
+      }
+
+      if (!result) {
+        Serial.println("Error: Failed to start Access Point");
+        return;
+      }
+
+      IPAddress ip = WiFi.softAPIP();
+      Serial.println("Access Point started");
+      Serial.print("AP SSID: ");
+      Serial.println(ap_ssid);
+      Serial.print("AP IP address: ");
+      Serial.println(ip);
+    }
+
+    // Остановка точки доступа WiFi (AP)
+    void stop_ap() {
+      if (WiFi.getMode() == WIFI_AP || WiFi.getMode() == WIFI_AP_STA) {
+        Serial.println("Stopping WiFi Access Point...");
+        WiFi.softAPdisconnect(true);
+        Serial.println("Access Point stopped");
+      } else {
+        Serial.println("Access Point is not running");
+      }
+    }
+
+
 };
